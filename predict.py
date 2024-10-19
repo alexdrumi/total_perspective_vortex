@@ -21,9 +21,9 @@ from feature_extractor import FeatureExtractor
 import joblib
 import matplotlib.pyplot as plt
 
-
-from epoch_extractor import epoch_extractooor, extract_epochs
-from feature_extractor import feature_extractor, create_feature_vectors, calculate_mean_power_energy
+import logging
+# from epoch_extractor import epoch_extractooor, extract_epochs
+# from feature_extractor import feature_extractor, create_feature_vectors, calculate_mean_power_energy
 
 from pca import My_PCA
 from sklearn.preprocessing import FunctionTransformer
@@ -35,6 +35,27 @@ import time
 
 from custom_scaler import CustomScaler
 from reshaper import Reshaper
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)
+
+#file handler - Logs to a file
+file_handler = logging.FileHandler('error_log.log', mode='w')
+file_handler.setLevel(logging.ERROR)
+
+#stream handler - Logs to terminal (console)
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.ERROR)
+
+#format for log messages
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+stream_handler.setFormatter(formatter)
+
+#add handlers to the logger
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 
 
@@ -75,55 +96,55 @@ files = [
 		"files/S082/S082R03.edf",
 		"files/S082/S082R07.edf",
 		"files/S048/S048R03.edf",
-		"files/S048/S048R11.edf",
-		"files/S048/S048R07.edf",
-		"files/S038/S038R11.edf",
-		"files/S038/S038R07.edf",
-		"files/S038/S038R03.edf",
-		"files/S040/S040R03.edf",
-		"files/S040/S040R07.edf",
-		"files/S040/S040R11.edf",
-		"files/S093/S093R07.edf",
-		"files/S093/S093R11.edf",
-		"files/S093/S093R03.edf",
-		"files/S047/S047R11.edf",
-		"files/S047/S047R07.edf",
-		"files/S047/S047R03.edf",
-		"files/S102/S102R07.edf",
-		"files/S102/S102R03.edf",
-		"files/S102/S102R11.edf",
-		"files/S083/S083R11.edf",
-		"files/S083/S083R03.edf",
-		"files/S083/S083R07.edf",
-		"files/S034/S034R07.edf",
-		"files/S034/S034R03.edf",
-		"files/S034/S034R11.edf",
-		"files/S041/S041R07.edf",
-		"files/S041/S041R03.edf",
-		"files/S041/S041R11.edf",
-		"files/S035/S035R07.edf",
-		"files/S035/S035R11.edf",
-		"files/S035/S035R03.edf",
-		"files/S060/S060R07.edf",
-		"files/S060/S060R11.edf",
-		"files/S060/S060R03.edf",
-		"files/S009/S009R11.edf",
-		"files/S009/S009R07.edf",
-		"files/S009/S009R03.edf",
-		"files/S045/S045R11.edf",
-		"files/S045/S045R07.edf",
-		"files/S045/S045R03.edf",
-		"files/S044/S044R03.edf",
-		"files/S044/S044R11.edf",
-		"files/S044/S044R07.edf",
-		"files/S029/S029R11.edf",
-		"files/S029/S029R03.edf",
-		"files/S029/S029R07.edf",
-		"files/S056/S056R03.edf",
-		"files/S056/S056R11.edf",
-		"files/S056/S056R07.edf",
-		"files/S076/S076R07.edf",
-		"files/S076/S076R03.edf",
+		# "files/S048/S048R11.edf",
+		# "files/S048/S048R07.edf",
+		# "files/S038/S038R11.edf",
+		# "files/S038/S038R07.edf",
+		# "files/S038/S038R03.edf",
+		# "files/S040/S040R03.edf",
+		# "files/S040/S040R07.edf",
+		# "files/S040/S040R11.edf",
+		# "files/S093/S093R07.edf",
+		# "files/S093/S093R11.edf",
+		# "files/S093/S093R03.edf",
+		# "files/S047/S047R11.edf",
+		# "files/S047/S047R07.edf",
+		# "files/S047/S047R03.edf",
+		# "files/S102/S102R07.edf",
+		# "files/S102/S102R03.edf",
+		# "files/S102/S102R11.edf",
+		# "files/S083/S083R11.edf",
+		# "files/S083/S083R03.edf",
+		# "files/S083/S083R07.edf",
+		# "files/S034/S034R07.edf",
+		# "files/S034/S034R03.edf",
+		# "files/S034/S034R11.edf",
+		# "files/S041/S041R07.edf",
+		# "files/S041/S041R03.edf",
+		# "files/S041/S041R11.edf",
+		# "files/S035/S035R07.edf",
+		# "files/S035/S035R11.edf",
+		# "files/S035/S035R03.edf",
+		# "files/S060/S060R07.edf",
+		# "files/S060/S060R11.edf",
+		# "files/S060/S060R03.edf",
+		# "files/S009/S009R11.edf",
+		# "files/S009/S009R07.edf",
+		# "files/S009/S009R03.edf",
+		# "files/S045/S045R11.edf",
+		# "files/S045/S045R07.edf",
+		# "files/S045/S045R03.edf",
+		# "files/S044/S044R03.edf",
+		# "files/S044/S044R11.edf",
+		# "files/S044/S044R07.edf",
+		# "files/S029/S029R11.edf",
+		# "files/S029/S029R03.edf",
+		# "files/S029/S029R07.edf",
+		# "files/S056/S056R03.edf",
+		# "files/S056/S056R11.edf",
+		# "files/S056/S056R07.edf",
+		# "files/S076/S076R07.edf",
+		# "files/S076/S076R03.edf",
 		#"/files/S076/S076R11.edf",
 		#"/files/S105/S105R07.edf",
 		#"/files/S105/S105R11.edf",
@@ -370,18 +391,41 @@ def plot_eeg_epochs_chunk(current_batch_idx, epochs_chunk, labels_chunk, predict
 
 
 def main():
-	pipeline = joblib.load('pipe.joblib')
-	dataset_preprocessor = Preprocessor()
 
-	predict_raw = dataset_preprocessor.load_raw_data(data_path=predict)
-	predict_filtered = dataset_preprocessor.filter_raw_data()
+	try:
+		dataset_preprocessor_instance = Preprocessor()
+		dataset_preprocessor_instance.load_raw_data(data_path=predict) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
+		filtered_data = dataset_preprocessor_instance.filter_raw_data() #THIS WILL BE INITIAL FILTER TRANSFORMER
 
-	epochs_predict, labels_predict = extract_epochs_and_labelsf(predict_filtered)
-	feature_transformer = FunctionTransformer(feature_extractor)
-	test_extracted_features = feature_transformer.transform(epochs_predict)
-	# print(f'{len(epochs_predict)} is the len of the EPOCHS extracted from filtered, {len(labels_predict)} is the len of the labels predicted\n')
-	# print(f'{predict_raw.ch_names} ARE THE CH NAMES!!!!!')
+		epoch_extractor_instance = EpochExtractor()
+		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
+
+	except FileNotFoundError as e:
+		logging.error(f"File not found: {e}")
+	except PermissionError as e:
+		logging.error(f"Permission on the file denied: {e}")
+	except IOError as e:
+		logging.error(f"Error reading the data file: {e}")
+	except ValueError as e:
+		logging.error(f"Invalid EDF files: {e}")
 	
+	
+	pipeline = joblib.load('pipe.joblib')
+	# dataset_preprocessor = Preprocessor()
+
+	# predict_raw = dataset_preprocessor.load_raw_data(data_path=predict)
+	# predict_filtered = dataset_preprocessor.filter_raw_data()
+
+	# epochs_predict, labels_predict = extract_epochs_and_labelsf(predict_filtered)
+	# feature_transformer = FunctionTransformer(feature_extractor)
+	feature_extractor_instance = FeatureExtractor()
+	test_extracted_features = feature_extractor_instance.extract_features(epochs_predict) 
+	# # print(f'{len(epochs_predict)} is the len of the EPOCHS extracted from filtered, {len(labels_predict)} is the len of the labels predicted\n')
+	# # print(f'{predict_raw.ch_names} ARE THE CH NAMES!!!!!')
+	
+
+
+
 	idx = 0
 	print(f'epoch nb:	[prediction]	[truth]		equal?')
 	chunk_range = 1 #len(test_extracted_features) // len(test_extracted_features)  #per 4 epochs lets say
