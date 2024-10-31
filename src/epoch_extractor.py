@@ -23,7 +23,7 @@ class EpochExtractor:
 
 	def extract_epochs_and_labels(self, filtered_eeg_data: mne.io.Raw) -> Tuple[list, np.ndarray]:
 			'''
-			Input: X->filtered eeg data, several eeg files thus we need a loop
+			Input: X->filtered eeg data, several eeg data thus we need a loop
 			output: Filtered epochs (based on different timeframes and associated high/low frequencies)
 			'''
 			epochs_list = []
@@ -34,35 +34,3 @@ class EpochExtractor:
 				label_list.append(epochs.events[:, 2] - 1) #1 or 2 essentially for T1, T2
 			
 			return epochs_list, np.concatenate(label_list)
-	
-
-
-
-
-
-
-# def extract_epochs(data):
-# 	event_id = {"T1": 1, "T2": 2}
-# 	events, _ = mne.events_from_annotations(data)
-# 	sfreq = data.info["sfreq"] #this is 160 but we could create a custom dataclass to pass this along, transform only expects an X output
-# 	epochs = mne.Epochs(data, events, event_id=event_id, tmin=-2, tmax=5.1,
-# 						baseline=None, preload=True)
-# 	return epochs, sfreq
-
-
-# def epoch_extractooor(X):
-# 		'''
-# 		Input: X->filtered eeg data, several eeg files thus we need a loop
-# 		output: Filtered epochs (based on different timeframes and associated high/low frequencies)
-# 		'''
-# 		epochs_list = []
-
-# 		for filtered_eeg_data in X:
-# 			# print('TRANSFORM IN EXTRACT EPOCHS')
-# 			epochs, sfreq = extract_epochs(filtered_eeg_data)
-# 			np_epochs = epochs.get_data()
-# 			epochs_list.append(epochs)
-# 			print(np_epochs)
-# 			print(epochs)
-# 		# print(f'{epochs_list} is the epochs list from transform')
-# 		return epochs_list
