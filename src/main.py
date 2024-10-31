@@ -352,7 +352,7 @@ def main():
 
 
 		best_pipeline = grid_search.best_estimator_
-		joblib.dump(best_pipeline, 'pipe.joblib')
+		joblib.dump(best_pipeline, '../models/pipe.joblib')
 
 
 	except FileNotFoundError as e:

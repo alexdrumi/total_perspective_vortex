@@ -40,7 +40,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
 #file handler - Logs to a file
-file_handler = logging.FileHandler('error_log.log', mode='w')
+file_handler = logging.FileHandler('../logs/error_log.log', mode='w')
 file_handler.setLevel(logging.ERROR)
 
 #stream handler - Logs to terminal (console)
@@ -274,7 +274,7 @@ def main():
 
 	
 	
-		pipeline = joblib.load('pipe.joblib')
+		pipeline = joblib.load('../models/pipe.joblib')
 		# dataset_preprocessor = Preprocessor()
 
 		# predict_raw = dataset_preprocessor.load_raw_data(data_path=predict)
