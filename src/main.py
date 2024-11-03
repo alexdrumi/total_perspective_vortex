@@ -227,8 +227,12 @@ def main():
 	try:
 		dataset_preprocessor_instance = Preprocessor()
 		dataset_preprocessor_instance.load_raw_data(data_path=train) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
+		# print(dataset_preprocessor_instance.raw_data)
 		filtered_data = dataset_preprocessor_instance.filter_raw_data() #THIS WILL BE INITIAL FILTER TRANSFORMER
 
+
+		# print(experiment)
+		sys.exit(1)
 		epoch_extractor_instance = EpochExtractor()
 		epochs, labels = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 
