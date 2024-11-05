@@ -15,28 +15,29 @@ TODO:
 
 class Preprocessor:
 	def __init__(self):
-		self.data_channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
+		# self.data_channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
+		self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 		self.raw_data = []
 		self.experiments_list = [
 			{
 				"runs": [3,7,11],
 				"mapping": {0: "rest", 1: "left fist", 2: "right fist"},
-				"event_id": {"left fist": 1, "right fist": 2},
+				"event_id": {"left fist": 2, "right fist": 3},
 			},
 			{
 				"runs": [4,8,12],
-				"mapping": {0: "rest", 1: "left fist imagined", 2: "right fist imagined"},
-				"event_id": {"left fist imaginedt": 1, "right fist imagined": 2},
+				"mapping": {0: "rest", 3: "left fist imagined", 4: "right fist imagined"},
+				"event_id": {"left fist imagined": 2, "right fist imagined": 3},
 			},
 			{
 				"runs": [5,9,13],
-				"mapping": {0: "rest", 1: "both fists", 2: "both feet"},
-				"event_id": {"both fists": 1, "both feet": 2},
+				"mapping": {0: "rest", 5: "both fists", 6: "both feet"},
+				"event_id": {"both fists": 2, "both feet": 3},
 			},
 			 {
 				"runs": [6, 10, 14],
-				"mapping": {0: "rest", 1: "both fists imagined", 2: "both feet imagined"},
-				"event_id": {"imagine both fists": 1, "imagine both feets": 2},
+				"mapping": {0: "rest", 7: "both fists imagined", 8: "both feet imagined"},
+				"event_id": {"imagine both fists": 2, "imagine both feet": 3},
 			},
 		]
 
@@ -51,7 +52,7 @@ class Preprocessor:
 
 
 	def load_raw_data(self, data_path: List[str]):
-		data_with_experiments = []
+		loaded_raw_data = []
 		for file_path in data_path:
 			file_path = Path(file_path)  #convert each individual path to a Path object
 			if not file_path.exists():
@@ -82,13 +83,13 @@ class Preprocessor:
 					continue
 				print('3')
 				raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
-	
+				
 				available_channels = raw.ch_names
 				if not all(channel in available_channels for channel in self.data_channels):
 					raise ValueError(f"File '{file_path}' does not contain the expected channels: {self.data_channels}")
 				
-				self.raw_data.append((raw, experiment, subject_id))
-				# data_with_experiments.append((raw, experiment, subject_id))
+				# self.raw_data.append((raw, experiment, subject_id))
+				loaded_raw_data.append((raw, experiment, subject_id))
 				print('4')
 
 
@@ -99,8 +100,8 @@ class Preprocessor:
 			except ValueError as ve:
 				raise ValueError(f"Invalid EDF file: {ve}")
 		print('5')
-		return self.raw_data
-		# return data_with_experiments
+		# return self.raw_data
+		return loaded_raw_data
 
 
 
@@ -112,15 +113,18 @@ class Preprocessor:
 
 
 
-	def filter_raw_data(self) -> List[mne.io.Raw]:
+	def filter_raw_data(self, loaded_raw_data) -> List[mne.io.Raw]:
 		filtered_data = []
-		for raw in self.raw_data:
-			raw[0].load_data()
-			print(f'data: {raw[0]}, experiment:{raw[1]}, subjectid: {raw[2]}')
+		for raw, experiment, subject_id in loaded_raw_data:
+			raw.load_data()
+			# print(f'data: {raw[0]}, experiment:{raw[1]}, subjectid: {raw[2]}')
+			# print(f"{raw.info['sfreq']} is the frequency")
+			current_filtered = self.filter_frequencies(raw, lo_cut=0.1, hi_cut=30, noise_cut=50)
+			filtered_data.append((current_filtered, experiment, subject_id))
 
-			filtered_data.append(self.filter_frequencies(raw[0], lo_cut=0.1, hi_cut=30, noise_cut=50))
-		self.raw_data = [] #empty memory, wouldnt it leak?
+		# self.raw_data = [] #empty memory, wouldnt it leak?
 
+		# print(filtered_data)
 		return filtered_data
 
 

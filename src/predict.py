@@ -61,11 +61,25 @@ predict = [
 # "../data/S104/S104R11.edf",
 # "../data/S104/S104R07.edf",
 # "../data/S090/S090R11.edf",
-"../data/S086/S086R11.edf",
-"../data/S086/S086R03.edf",
-"../data/S086/S086R07.edf",
-"../data/S017/S017R11.edf",
-"../data/S017/S017R07.edf",
+# "../data/S086/S086R11.edf",
+# "../data/S086/S086R03.edf",
+# "../data/S086/S086R07.edf",
+# "../data/S017/S017R11.edf",
+# "../data/S017/S017R07.edf",
+
+
+"../data/S018/S018R03.edf",
+"../data/S018/S018R07.edf",
+"../data/S018/S018R11.edf",
+
+
+
+
+"../data/S058/S058R03.edf",
+"../data/S058/S058R07.edf",
+"../data/S058/S058R11.edf",
+
+
 #"../data/S017/S017R03.edf",
 #..//data/S013/S013R07.edf",
 #"../data/S013/S013R11.edf",
@@ -187,8 +201,8 @@ def display_epoch_stats(start, chunk_size, current_pred, current_labels):
 def main():
 	try:
 		dataset_preprocessor_instance = Preprocessor()
-		dataset_preprocessor_instance.load_raw_data(data_path=predict) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
-		filtered_data = dataset_preprocessor_instance.filter_raw_data() #THIS WILL BE INITIAL FILTER TRANSFORMER
+		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
+		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #THIS WILL BE INITIAL FILTER TRANSFORMER
 
 		epoch_extractor_instance = EpochExtractor()
 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
