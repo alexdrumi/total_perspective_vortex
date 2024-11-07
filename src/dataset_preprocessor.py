@@ -53,8 +53,78 @@ class Preprocessor:
 
 	def load_raw_data(self, data_path: List[str]):
 		loaded_raw_data = []
+		concatted_raw_data_dict = {
+			'3': [],
+			'4': [],
+			'5': [],
+			'6': []
+		}
+		#also concatenate the ones which have same names (same runtypes)
+		# for file_path in data_path:
+		# 	file_path = Path(file_path)  #convert each individual path to a Path object
+		# 	if not file_path.exists():
+		# 		raise FileNotFoundError(f"Data path/file '{file_path}' does not exist.")
+		# 	try:
+		# 		print(f'{file_path} is the filepath')
+
+		# 		filename = os.path.basename(file_path)
+		# 		filename_without_ext = os.path.splitext(filename)[0]
+		# 		subject_part = filename_without_ext[:4]  #'S***'->see in data folder
+		# 		run_part = filename_without_ext[4:]
+		# 		print(f'{run_part} is the runpart')
+
+		# 		# print(subject_part)
+		# 		# print(run_part)
+		# 		#in case someone w upload different data, check for names
+		# 		print('1')
+		# 		if subject_part[0] != 'S' or run_part[0] != 'R':
+		# 			raise ValueError(f"Invalid filename format: '{filename}'")
+
+		# 		print('2')
+		# 		run_nr = int(run_part[-2:]) #Snrnrnr
+		# 		subject_id = int(subject_part[1:]) #already extracted above from 4:
+		# 		print(f'{run_nr} is the runnr')
+		# 		#get the experiment based on the run number
+		# 		experiment = self.get_experiment_by_run(run_nr)
+		# 		if not experiment:
+		# 			print(f"Run {run_nr} does not correspond to any experiment, skipping it.")
+		# 			continue
+		# 		print('3')
+		# 		raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
+		# 		if (run_nr == 3 or run_nr == 7 or run_nr == 11):
+		# 			print('inside if statement')
+
+		# 			concatted_raw_data_dict['3'].append(raw)
+
+		# 		print(f'{concatted_raw_data_dict["3"]} is the rawdatadict')
+		# 		available_channels = raw.ch_names
+		# 		if not all(channel in available_channels for channel in self.data_channels):
+		# 			raise ValueError(f"File '{file_path}' does not contain the expected channels: {self.data_channels}")
+				
+		# 		# self.raw_data.append((raw, experiment, subject_id))
+		# 		loaded_raw_data.append((raw, experiment, subject_id))
+		# 		print('4')
+
+
+		# 	except PermissionError:
+		# 		raise PermissionError(f"Permission denied: Unable to access '{file_path}'. Check file permissions.")
+		# 	except IOError as e:
+		# 		raise IOError(f"Error reading file '{file_path}': {e}")
+		# 	except ValueError as ve:
+		# 		raise ValueError(f"Invalid EDF file: {ve}")
+		# 	print('5')
+		# 	# return self.raw_data
+		# 	for key, raw_list in concatted_raw_data_dict.items():
+		# 		print('inside loop')
+		# 		if raw_list:
+		# 			print(raw_list)
+		# 			# concatted_raw_data_dict[key] = mne.concatenate_raws(raw_list)
+		
+		# return (concatted_raw_data_dict['3']) 
+		# #, concatted_raw_data_dict['4'], concatted_raw_data_dict['5'], concatted_raw_data_dict['6'])
+		# # return loaded_raw_data
 		for file_path in data_path:
-			file_path = Path(file_path)  #convert each individual path to a Path object
+			file_path = Path(file_path)  # Convert each individual path to a Path object
 			if not file_path.exists():
 				raise FileNotFoundError(f"Data path/file '{file_path}' does not exist.")
 			try:
@@ -62,36 +132,41 @@ class Preprocessor:
 
 				filename = os.path.basename(file_path)
 				filename_without_ext = os.path.splitext(filename)[0]
-				subject_part = filename_without_ext[:4]  #'S***'->see in data folder
+				subject_part = filename_without_ext[:4]  # 'S***'
 				run_part = filename_without_ext[4:]
+				print(f'{run_part} is the runpart')
 
-				# print(subject_part)
-				# print(run_part)
-				#in case someone w upload different data, check for names
-				print('1')
 				if subject_part[0] != 'S' or run_part[0] != 'R':
 					raise ValueError(f"Invalid filename format: '{filename}'")
 
-				print('2')
-				run_nr = int(run_part[1:]) #Snrnrnr
-				subject_id = int(subject_part[1:]) #already extracted above from 4:
+				run_nr = int(run_part[-2:])
+				subject_id = int(subject_part[1:])
+				print(f'{run_nr} is the runnr')
 
-				#get the experiment based on the run number
 				experiment = self.get_experiment_by_run(run_nr)
 				if not experiment:
 					print(f"Run {run_nr} does not correspond to any experiment, skipping it.")
 					continue
+
 				print('3')
 				raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
-				
+
+				# Add the raw object to the correct list based on the run number
+				if run_nr in [3, 7, 11]:
+					concatted_raw_data_dict['3'].append(raw)
+				elif run_nr in [4, 8, 12]:
+					concatted_raw_data_dict['4'].append(raw)
+				elif run_nr in [5, 9, 13]:
+					concatted_raw_data_dict['5'].append(raw)
+				elif run_nr in [6, 10, 14]:
+					concatted_raw_data_dict['6'].append(raw)
+
 				available_channels = raw.ch_names
 				if not all(channel in available_channels for channel in self.data_channels):
 					raise ValueError(f"File '{file_path}' does not contain the expected channels: {self.data_channels}")
-				
-				# self.raw_data.append((raw, experiment, subject_id))
-				loaded_raw_data.append((raw, experiment, subject_id))
-				print('4')
 
+				# Add tuple to loaded_raw_data with raw, experiment, subject_id
+				loaded_raw_data.append((raw, experiment, subject_id))
 
 			except PermissionError:
 				raise PermissionError(f"Permission denied: Unable to access '{file_path}'. Check file permissions.")
@@ -99,10 +174,18 @@ class Preprocessor:
 				raise IOError(f"Error reading file '{file_path}': {e}")
 			except ValueError as ve:
 				raise ValueError(f"Invalid EDF file: {ve}")
-		print('5')
-		# return self.raw_data
-		return loaded_raw_data
 
+		# After processing all files, concatenate raws in each list in concatted_raw_data_dict
+		for key, raw_list in concatted_raw_data_dict.items():
+			if raw_list:  # Only concatenate if the list is not empty
+				concatted_raw_data_dict[key] = mne.concatenate_raws(raw_list)
+			else:
+				print('KEY IS EMPTY')
+				concatted_raw_data_dict[key] = None  # Or handle empty lists as needed
+
+		return concatted_raw_data_dict
+
+# 
 
 
 	def filter_frequencies(self, raw: mne.io.Raw, lo_cut: float, hi_cut: float, noise_cut: float):
@@ -114,18 +197,18 @@ class Preprocessor:
 
 
 	def filter_raw_data(self, loaded_raw_data) -> List[mne.io.Raw]:
-		filtered_data = []
-		for raw, experiment, subject_id in loaded_raw_data:
-			raw.load_data()
-			# print(f'data: {raw[0]}, experiment:{raw[1]}, subjectid: {raw[2]}')
-			# print(f"{raw.info['sfreq']} is the frequency")
-			current_filtered = self.filter_frequencies(raw, lo_cut=0.1, hi_cut=30, noise_cut=50)
-			filtered_data.append((current_filtered, experiment, subject_id))
+		filtered_data_dict = {}
+		for key, raw in loaded_raw_data.items():
+			if raw is not None:  #ensure there is data to filter
+				raw.load_data()  #load for filtering
+				current_filtered = self.filter_frequencies(raw, lo_cut=0.1, hi_cut=30, noise_cut=50)
+				filtered_data_dict[key] = current_filtered
+			else:
+				print(f'KEY {key} IS EMPTY')
+				filtered_data_dict[key] = None #handle empty keys if needed
 
-		# self.raw_data = [] #empty memory, wouldnt it leak?
-
-		# print(filtered_data)
-		return filtered_data
+		return filtered_data_dict
+	
 
 
 

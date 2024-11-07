@@ -104,13 +104,13 @@ train = [
 		"../data/S018/S018R07.edf",
 		"../data/S018/S018R11.edf",
 
-		# "../data/S028/S028R03.edf",
-		# "../data/S028/S028R07.edf",
-		# "../data/S028/S028R11.edf",
+		"../data/S028/S028R03.edf",
+		"../data/S028/S028R07.edf",
+		"../data/S028/S028R11.edf",
 
-		# "../data/S038/S038R03.edf",
-		# "../data/S038/S038R07.edf",
-		# "../data/S038/S038R11.edf",
+		"../data/S038/S038R03.edf",
+		"../data/S038/S038R07.edf",
+		"../data/S038/S038R11.edf",
 
 
 		# "../data/S048/S048R03.edf",
@@ -166,25 +166,25 @@ train = [
 		# "../data/S018/S018R10.edf",
 		# "../data/S018/S018R14.edf",
 
-		"../data/S028/S028R03.edf",
-		"../data/S028/S028R07.edf",
-		"../data/S028/S028R11.edf",
+		# "../data/S028/S028R03.edf",
+		# "../data/S028/S028R07.edf",
+		# "../data/S028/S028R11.edf",
 
-		"../data/S028/S028R04.edf",
-		"../data/S028/S028R08.edf",
-		"../data/S028/S028R12.edf",
+		# "../data/S028/S028R04.edf",
+		# "../data/S028/S028R08.edf",
+		# "../data/S028/S028R12.edf",
 
-		"../data/S028/S028R05.edf",
-		"../data/S028/S028R09.edf",
-		"../data/S028/S028R13.edf",
+		# "../data/S028/S028R05.edf",
+		# "../data/S028/S028R09.edf",
+		# "../data/S028/S028R13.edf",
 
-		"../data/S028/S028R06.edf",
-		"../data/S028/S028R10.edf",
-		"../data/S028/S028R14.edf",
+		# "../data/S028/S028R06.edf",
+		# "../data/S028/S028R10.edf",
+		# "../data/S028/S028R14.edf",
 
 
 
-		"../data/S038/S038R03.edf",
+		# "../data/S038/S038R03.edf",
 		# "../data/S038/S038R07.edf",
 		# "../data/S038/S038R11.edf",
 		# "../data/S038/S038R04.edf",
@@ -342,15 +342,20 @@ def main():
 		dataset_preprocessor_instance = Preprocessor()
 		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=train) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
 		# print(dataset_preprocessor_instance.raw_data)
+		print(type(loaded_raw_data))
 		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #this returns a triplet now
-
+		print(filtered_data) #this is a dict now
+		# print(loaded_raw_data)
+		# sys.exit(1)
 		# for data in filtered_data:
 		# 	print(data[0], data[1], data[2])
 		# sys.exit(1)
 		# print(experiment)
 		epoch_extractor_instance = EpochExtractor()
 		epochs, labels = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
-		# print(labels)
+
+		print(labels)
+		print(epochs)
 		# sys.exit(1)
 
 		# for idx, epoch in enumerate(epochs):
@@ -359,7 +364,10 @@ def main():
 
 		feature_extractor_instance = FeatureExtractor()
 		trained_extracted_features = feature_extractor_instance.extract_features(epochs) #callable
+		# trained_extracted_features = trained_extracted_features['3']
 
+		# print(f'{trained_extracted_features}')
+		# sys.exit(1)
 
 		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
 		custom_scaler = CustomScaler()
@@ -411,31 +419,31 @@ def main():
 
 		grid_search_params = [
 			#MLP
-			{
-				'classifier': [MLPClassifier(
-					max_iter=16000,
-					early_stopping=True,
-					n_iter_no_change=100, #if it doesnt improve for 10 epochs
-					verbose=True)],
-				'pca__n_comps': [20,30,42,50],
-				#hidden layers of multilayer perceptron class
-				'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 50)],
-				#relu->helps mitigate vanishing gradients, faster convergence
-				#tanh->hyperbolic tangent, outputs centered around zero
-				'classifier__activation': ['relu', 'tanh'],
-				#adam, efficient for large datasets, adapts learning rates
-				#stochastic gradient, generalize better, slower convergence
-				'classifier__solver': ['adam', 'sgd'],
-				'classifier__learning_rate_init': [0.001, 0.01, 0.1]
+			# {
+			# 	'classifier': [MLPClassifier(
+			# 		max_iter=16000,
+			# 		early_stopping=True,
+			# 		n_iter_no_change=100, #if it doesnt improve for 10 epochs
+			# 		verbose=True)],
+			# 	'pca__n_comps': [20,30,42,50],
+			# 	#hidden layers of multilayer perceptron class
+			# 	'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 50)],
+			# 	#relu->helps mitigate vanishing gradients, faster convergence
+			# 	#tanh->hyperbolic tangent, outputs centered around zero
+			# 	'classifier__activation': ['relu', 'tanh'],
+			# 	#adam, efficient for large datasets, adapts learning rates
+			# 	#stochastic gradient, generalize better, slower convergence
+			# 	'classifier__solver': ['adam', 'sgd'],
+			# 	'classifier__learning_rate_init': [0.001, 0.01, 0.1]
 
-			},
-			#SVC
-			{
-				'classifier': [SVC()],
-				'pca__n_comps': [20, 30, 42, 50],
-				'classifier__C': [0.1, 1, 10],
-				'classifier__kernel': ['linear', 'rbf']
-			},
+			# },
+			# #SVC
+			# {
+			# 	'classifier': [SVC()],
+			# 	'pca__n_comps': [20, 30, 42, 50],
+			# 	'classifier__C': [0.1, 1, 10],
+			# 	'classifier__kernel': ['linear', 'rbf']
+			# },
 			
 			#RANDOM FOREST
 			{

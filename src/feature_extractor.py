@@ -33,44 +33,71 @@ class FeatureExtractor():
 		return np.array(feature_matrix)
 
 
-
-	def extract_features(self, extracted_epochs: list) -> np.ndarray:
+	#extracted epochs will be adict now
+	def extract_features(self, extracted_epochs_dict):
 		'''
 		Input: filtered and cropped list of epochs from EpochExtractor
 		Output: a (x,y,z)d np array of created features based on mean, energy, power
 		NO LABELS HERE, WILL DO SEPARATE
 		'''
 	
-		sfreq = 160.0 #this we could get from mne but is consistent across all data here.
+
+
+		sfreq = 160.0
 		all_features = []
-		for filtered_epochs in extracted_epochs:
-			analysis = {
-				'mrcp': {'tmin': -2, 'tmax': 0, 'lofreq': 3, 'hifreq': 30},
-				'erd': {'tmin': -2, 'tmax': 0, 'lofreq': 8, 'hifreq': 30},
-				'ers': {'tmin': 4.1, 'tmax': 5.1, 'lofreq': 8, 'hifreq': 30}
-			}
+
+		#define analysis parameters
+		analysis = {
+			'mrcp': {'tmin': -2, 'tmax': 0, 'lofreq': 3, 'hifreq': 30},
+			'erd': {'tmin': -2, 'tmax': 0, 'lofreq': 8, 'hifreq': 30},
+			'ers': {'tmin': 4.1, 'tmax': 5.1, 'lofreq': 8, 'hifreq': 30}
+		}
+
+		for key, epochs in extracted_epochs_dict.items():
+			if epochs is None:
+				print(f"Key '{key}' has no epochs, skipping feature extraction.")
+				continue
+
+			print(f"Processing features for key: '{key}' with {len(epochs)} epochs.")
 
 			feature_matrices = []
-			for analysis_name, parameters in analysis.items():
-				#you need the copy here
-				cropped_epochs = filtered_epochs.copy().crop(tmin=parameters['tmin'], tmax=parameters['tmax'])
-				filtered_epoch = cropped_epochs.filter(h_freq=parameters['hifreq'],
-														l_freq=parameters['lofreq'],
-														method='iir')
-				
-				feature_matrix =  self.create_feature_vectors(filtered_epoch, sfreq)
+			for analysis_name, params in analysis.items():
+				#crop epochs based on analysis parameters
+				cropped_epochs = epochs.copy().crop(tmin=params['tmin'], tmax=params['tmax'])
+				print(f"  - Cropped epochs for analysis '{analysis_name}': {params['tmin']} to {params['tmax']} seconds.")
+
+				# Apply filtering
+				filtered_epoch = cropped_epochs.filter(
+					l_freq=params['lofreq'],
+					h_freq=params['hifreq'],
+					method='iir'
+				)
+				print(f"  - Applied IIR filter: {params['lofreq']}-{params['hifreq']} Hz.")
+
+				#create feature vectors
+				feature_matrix = self.create_feature_vectors(filtered_epoch, sfreq)
+				print(f"  - Extracted features for analysis '{analysis_name}': {feature_matrix.shape}")
+
 				feature_matrices.append(feature_matrix)
-				
-				#check samples for consistent counts
-				sample_counts = [fm.shape[0] for fm in feature_matrices]
-				if not all(count == sample_counts[0] for count in sample_counts):
-					raise ValueError("Inconsistent number of samples across analyses. Ensure all have the same number of epochs.")
-				#we could have used maybe multiprocessing with pool but can be buggy and this works just fine for now
-			all_features.append(np.concatenate(feature_matrices, axis=1))
 
-		concatenated_features = np.concatenate(all_features, axis=0) #this is now (59 epoch list, 21 epochs inside, 9*8 feature combinations) thus we need to concat them 
+			if not feature_matrices:
+				print(f"No features extracted for key '{key}'.")
+				continue
+
+			# Concatenate feature matrices horizontally (features combined)
+			concatenated_features = np.concatenate(feature_matrices, axis=1)  # Shape: (n_epochs, total_features)
+			print(f"  - Concatenated features shape for key '{key}': {concatenated_features.shape}")
+
+			all_features.append(concatenated_features)
+
+		if not all_features:
+			raise ValueError("No features were extracted from the provided epochs.")
+
+		# Concatenate all features vertically (all epochs across keys)
+		concatenated_features = np.vstack(all_features)  # Shape: (total_epochs, total_features)
+		print(f"Total concatenated features shape: {concatenated_features.shape}")
+
 		return concatenated_features
-
 
 
 
