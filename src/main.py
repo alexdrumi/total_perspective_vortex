@@ -66,7 +66,7 @@ logger.addHandler(stream_handler)
 
 
 mne.set_log_level(verbose='WARNING')
-# channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
+channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 # channels = ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
             # "CP3",
             # "CP1",
@@ -354,8 +354,8 @@ def main():
 		epoch_extractor_instance = EpochExtractor()
 		epochs, labels = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 
-		print(labels)
-		print(epochs)
+		# print(labels)
+		# print(epochs)
 		# sys.exit(1)
 
 		# for idx, epoch in enumerate(epochs):
@@ -366,7 +366,7 @@ def main():
 		trained_extracted_features = feature_extractor_instance.extract_features(epochs) #callable
 		# trained_extracted_features = trained_extracted_features['3']
 
-		# print(f'{trained_extracted_features}')
+		print(f'{trained_extracted_features}')
 		# sys.exit(1)
 
 		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
@@ -388,8 +388,7 @@ def main():
 			('pca', my_pca),
 			('classifier', mlp_classifier) #mlp will be replaced in grid search
 		])
-
-	# pipeline.fit(trained_extracted_features, labels)
+		pipeline.fit(trained_extracted_features, labels)
 
 
 	# #------------------------------------------------------------------------------------------------------------
@@ -416,9 +415,10 @@ def main():
 		print(f'Average accuracy: {scores.mean()}')
 
 
+		sys.exit(1)
 
-		grid_search_params = [
-			#MLP
+		# grid_search_params = [
+		# 	#MLP
 			# {
 			# 	'classifier': [MLPClassifier(
 			# 		max_iter=16000,
@@ -446,55 +446,55 @@ def main():
 			# },
 			
 			#RANDOM FOREST
-			{
-				'classifier': [RandomForestClassifier()],
-				'pca__n_comps': [20,30,42,50],
-				'classifier__n_estimators': [50, 100, 200],
-				'classifier__max_depth': [None, 10, 20]
-			},
-			#DECISION TREE
-			{
-				'pca__n_comps': [20, 30, 42, 50],
-				'classifier': [DecisionTreeClassifier()],
-				'classifier__max_depth': [None, 10, 20],
-				'classifier__min_samples_split': [2, 5, 10]
-			},
-			# Logistic Regression
-			{
-				'classifier': [LogisticRegression()],
-				'pca__n_comps': [20, 30, 42, 50],
-				'classifier__C': [0.1, 1, 10],
-				'classifier__penalty': ['l1', 'l2'],
-				'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
-				'classifier__multi_class': ['auto'],
-				'classifier__max_iter': [1000, 5000]
-			}
-		]
+		# 	{
+		# 		'classifier': [RandomForestClassifier()],
+		# 		'pca__n_comps': [20,30,42,50],
+		# 		'classifier__n_estimators': [50, 100, 200],
+		# 		'classifier__max_depth': [None, 10, 20]
+		# 	},
+		# 	#DECISION TREE
+		# 	{
+		# 		'pca__n_comps': [20, 30, 42, 50],
+		# 		'classifier': [DecisionTreeClassifier()],
+		# 		'classifier__max_depth': [None, 10, 20],
+		# 		'classifier__min_samples_split': [2, 5, 10]
+		# 	},
+		# 	# Logistic Regression
+		# 	{
+		# 		'classifier': [LogisticRegression()],
+		# 		'pca__n_comps': [20, 30, 42, 50],
+		# 		'classifier__C': [0.1, 1, 10],
+		# 		'classifier__penalty': ['l1', 'l2'],
+		# 		'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
+		# 		'classifier__multi_class': ['auto'],
+		# 		'classifier__max_iter': [1000, 5000]
+		# 	}
+		# ]
 
-		from sklearn.model_selection import GridSearchCV
+		# from sklearn.model_selection import GridSearchCV
 
-		grid_search = GridSearchCV(
-			estimator=pipeline,
-			param_grid=grid_search_params,
-			cv=9,  #9fold cross-val
-			scoring='accuracy',  #evalmetric
-			n_jobs=-1,  #util all all available cpu cores
-			verbose=2,  # For detailed output
-			refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
-		)
+		# grid_search = GridSearchCV(
+		# 	estimator=pipeline,
+		# 	param_grid=grid_search_params,
+		# 	cv=9,  #9fold cross-val
+		# 	scoring='accuracy',  #evalmetric
+		# 	n_jobs=-1,  #util all all available cpu cores
+		# 	verbose=2,  # For detailed output
+		# 	refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
+		# )
 
-		#just to use standard variables
-		X_train = trained_extracted_features
-		y_train = labels 
-		grid_search.fit(X_train, y_train)
+		# #just to use standard variables
+		# X_train = trained_extracted_features
+		# y_train = labels 
+		# grid_search.fit(X_train, y_train)
 
-		print("Best Parameters:")
-		print(grid_search.best_params_)
-		print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.2f}")
+		# print("Best Parameters:")
+		# print(grid_search.best_params_)
+		# print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.2f}")
 
 
-		best_pipeline = grid_search.best_estimator_
-		joblib.dump(best_pipeline, '../models/pipe.joblib')
+		# best_pipeline = grid_search.best_estimator_
+		# joblib.dump(best_pipeline, '../models/pipe.joblib')
 
 
 	except FileNotFoundError as e:

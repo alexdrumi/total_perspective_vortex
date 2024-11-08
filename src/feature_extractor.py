@@ -54,6 +54,8 @@ class FeatureExtractor():
 		}
 
 		for key, epochs in extracted_epochs_dict.items():
+			print('INSIDE KEY EPOCHS LOOP IN FEATURE EXTRACTOR')
+			print(f'{epochs} is epochs here')
 			if epochs is None:
 				print(f"Key '{key}' has no epochs, skipping feature extraction.")
 				continue
@@ -94,8 +96,14 @@ class FeatureExtractor():
 			raise ValueError("No features were extracted from the provided epochs.")
 
 		# Concatenate all features vertically (all epochs across keys)
-		concatenated_features = np.vstack(all_features)  # Shape: (total_epochs, total_features)
-		print(f"Total concatenated features shape: {concatenated_features.shape}")
+		concatenated_features = np.concatenate(all_features, axis=0)
+		n_samples, n_features, n_channels = concatenated_features.shape #total epochs, 9, n channels
+  		# Shape: (total_epochs, total_features)
+		# flattened_features = concatenated_features.reshape(n_samples, n_features * n_channels)
+
+		print(n_samples, n_features, n_channels)
+		print('are the samples features and channels')
+		# print(f"Total flattened features shape: {flattened_features.shape}")
 
 		return concatenated_features
 
