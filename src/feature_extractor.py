@@ -104,7 +104,7 @@ class FeatureExtractor():
 		print(n_samples, n_features, n_channels)
 		print('are the samples features and channels')
 		# print(f"Total flattened features shape: {flattened_features.shape}")
-
+		print(f'{concatenated_features.shape} is the concatted shape')
 		return concatenated_features
 
 

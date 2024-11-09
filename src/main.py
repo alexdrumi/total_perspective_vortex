@@ -367,6 +367,9 @@ def main():
 		# trained_extracted_features = trained_extracted_features['3']
 
 		print(f'{trained_extracted_features}')
+		print(f'{type(trained_extracted_features)} is the feature type, {type(labels)} is the typeoflabels')
+		# print(type(trained_extracted_features))
+
 		# sys.exit(1)
 
 		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
@@ -388,7 +391,7 @@ def main():
 			('pca', my_pca),
 			('classifier', mlp_classifier) #mlp will be replaced in grid search
 		])
-		pipeline.fit(trained_extracted_features, labels)
+		pipeline.fit(trained_extracted_features, labels['3'])
 
 
 	# #------------------------------------------------------------------------------------------------------------
@@ -406,95 +409,95 @@ def main():
 		# # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_validation)
 		scores = cross_val_score(
 			pipeline, trained_extracted_features, 
-			labels,  
+			labels['3'],  
 			scoring='accuracy', 
 			cv=shuffle_split_validation
 		)
 		
 		print(scores)
-		print(f'Average accuracy: {scores.mean()}')
+		# print(f'Average accuracy: {scores.mean()}')
 
 
-		sys.exit(1)
+		# sys.exit(1)
 
-		# grid_search_params = [
-		# 	#MLP
-			# {
-			# 	'classifier': [MLPClassifier(
-			# 		max_iter=16000,
-			# 		early_stopping=True,
-			# 		n_iter_no_change=100, #if it doesnt improve for 10 epochs
-			# 		verbose=True)],
-			# 	'pca__n_comps': [20,30,42,50],
-			# 	#hidden layers of multilayer perceptron class
-			# 	'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 50)],
-			# 	#relu->helps mitigate vanishing gradients, faster convergence
-			# 	#tanh->hyperbolic tangent, outputs centered around zero
-			# 	'classifier__activation': ['relu', 'tanh'],
-			# 	#adam, efficient for large datasets, adapts learning rates
-			# 	#stochastic gradient, generalize better, slower convergence
-			# 	'classifier__solver': ['adam', 'sgd'],
-			# 	'classifier__learning_rate_init': [0.001, 0.01, 0.1]
+		grid_search_params = [
+			#MLP
+			{
+				'classifier': [MLPClassifier(
+					max_iter=16000,
+					early_stopping=True,
+					n_iter_no_change=100, #if it doesnt improve for 10 epochs
+					verbose=True)],
+				'pca__n_comps': [20,30,42,50],
+				#hidden layers of multilayer perceptron class
+				'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 50)],
+				#relu->helps mitigate vanishing gradients, faster convergence
+				#tanh->hyperbolic tangent, outputs centered around zero
+				'classifier__activation': ['relu', 'tanh'],
+				#adam, efficient for large datasets, adapts learning rates
+				#stochastic gradient, generalize better, slower convergence
+				'classifier__solver': ['adam', 'sgd'],
+				'classifier__learning_rate_init': [0.001, 0.01, 0.1]
 
-			# },
-			# #SVC
-			# {
-			# 	'classifier': [SVC()],
-			# 	'pca__n_comps': [20, 30, 42, 50],
-			# 	'classifier__C': [0.1, 1, 10],
-			# 	'classifier__kernel': ['linear', 'rbf']
-			# },
+			},
+			#SVC
+			{
+				'classifier': [SVC()],
+				'pca__n_comps': [20, 30, 42, 50],
+				'classifier__C': [0.1, 1, 10],
+				'classifier__kernel': ['linear', 'rbf']
+			},
 			
-			#RANDOM FOREST
-		# 	{
-		# 		'classifier': [RandomForestClassifier()],
-		# 		'pca__n_comps': [20,30,42,50],
-		# 		'classifier__n_estimators': [50, 100, 200],
-		# 		'classifier__max_depth': [None, 10, 20]
-		# 	},
-		# 	#DECISION TREE
-		# 	{
-		# 		'pca__n_comps': [20, 30, 42, 50],
-		# 		'classifier': [DecisionTreeClassifier()],
-		# 		'classifier__max_depth': [None, 10, 20],
-		# 		'classifier__min_samples_split': [2, 5, 10]
-		# 	},
-		# 	# Logistic Regression
-		# 	{
-		# 		'classifier': [LogisticRegression()],
-		# 		'pca__n_comps': [20, 30, 42, 50],
-		# 		'classifier__C': [0.1, 1, 10],
-		# 		'classifier__penalty': ['l1', 'l2'],
-		# 		'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
-		# 		'classifier__multi_class': ['auto'],
-		# 		'classifier__max_iter': [1000, 5000]
-		# 	}
-		# ]
+			# RANDOM FOREST
+			{
+				'classifier': [RandomForestClassifier()],
+				'pca__n_comps': [20,30,42,50],
+				'classifier__n_estimators': [50, 100, 200],
+				'classifier__max_depth': [None, 10, 20]
+			},
+			#DECISION TREE
+			{
+				'pca__n_comps': [20, 30, 42, 50],
+				'classifier': [DecisionTreeClassifier()],
+				'classifier__max_depth': [None, 10, 20],
+				'classifier__min_samples_split': [2, 5, 10]
+			},
+			# Logistic Regression
+			{
+				'classifier': [LogisticRegression()],
+				'pca__n_comps': [20, 30, 42, 50],
+				'classifier__C': [0.1, 1, 10],
+				'classifier__penalty': ['l1', 'l2'],
+				'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
+				'classifier__multi_class': ['auto'],
+				'classifier__max_iter': [1000, 5000]
+			}
+		]
 
-		# from sklearn.model_selection import GridSearchCV
+		from sklearn.model_selection import GridSearchCV
 
-		# grid_search = GridSearchCV(
-		# 	estimator=pipeline,
-		# 	param_grid=grid_search_params,
-		# 	cv=9,  #9fold cross-val
-		# 	scoring='accuracy',  #evalmetric
-		# 	n_jobs=-1,  #util all all available cpu cores
-		# 	verbose=2,  # For detailed output
-		# 	refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
-		# )
+		grid_search = GridSearchCV(
+			estimator=pipeline,
+			param_grid=grid_search_params,
+			cv=9,  #9fold cross-val
+			scoring='accuracy',  #evalmetric
+			n_jobs=-1,  #util all all available cpu cores
+			verbose=2,  # For detailed output
+			refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
+		)
 
-		# #just to use standard variables
-		# X_train = trained_extracted_features
-		# y_train = labels 
-		# grid_search.fit(X_train, y_train)
+		#just to use standard variables
+		X_train = trained_extracted_features
+		y_train = labels['3']
+		grid_search.fit(X_train, y_train)
 
-		# print("Best Parameters:")
-		# print(grid_search.best_params_)
-		# print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.2f}")
+		print("Best Parameters:")
+		print(grid_search.best_params_)
+		print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.2f}")
 
 
-		# best_pipeline = grid_search.best_estimator_
-		# joblib.dump(best_pipeline, '../models/pipe.joblib')
+		best_pipeline = grid_search.best_estimator_
+		joblib.dump(best_pipeline, '../models/pipe.joblib')
 
 
 	except FileNotFoundError as e:
