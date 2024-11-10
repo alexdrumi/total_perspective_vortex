@@ -68,17 +68,47 @@ predict = [
 # "../data/S017/S017R07.edf",
 
 
-"../data/S018/S018R03.edf",
-"../data/S018/S018R07.edf",
-"../data/S018/S018R11.edf",
+"../data/S098/S098R03.edf",
+"../data/S098/S098R07.edf",
+"../data/S098/S098R11.edf",
+
+"../data/S051/S051R03.edf",
+"../data/S051/S051R07.edf",
+"../data/S051/S051R11.edf",
+
+"../data/S052/S052R03.edf",
+"../data/S052/S052R07.edf",
+"../data/S052/S052R11.edf",
+
+"../data/S053/S053R03.edf",
+"../data/S053/S053R07.edf",
+"../data/S053/S053R11.edf",
 
 
 
+"../data/S054/S054R03.edf",
+"../data/S054/S054R07.edf",
+"../data/S054/S054R11.edf",
 
-"../data/S058/S058R03.edf",
-"../data/S058/S058R07.edf",
-"../data/S058/S058R11.edf",
 
+
+"../data/S061/S061R03.edf",
+"../data/S061/S061R07.edf",
+"../data/S061/S061R11.edf",
+
+"../data/S062/S062R03.edf",
+"../data/S062/S062R07.edf",
+"../data/S062/S062R11.edf",
+
+"../data/S063/S063R03.edf",
+"../data/S063/S063R07.edf",
+"../data/S063/S063R11.edf",
+
+
+
+"../data/S064/S064R03.edf",
+"../data/S064/S064R07.edf",
+"../data/S064/S064R11.edf",
 
 #"../data/S017/S017R03.edf",
 #..//data/S013/S013R07.edf",
@@ -219,7 +249,8 @@ def main():
 		chunk_size = 21  #number of epochs per plot (per datafile)
 		total_chunks = len(flattened_epochs) // chunk_size #chunk is at the moment all the epochs per datafile (21)
 
-		flattened_labels = labels_predict  #already concatenated->for clarity that its flattened
+		flattened_labels = labels_predict['3']  #already concatenated->for clarity that its flattened
+		print(flattened_labels)
 		chunk_size = 21  # Number of epochs per plot (per file)
 		total_chunks = len(flattened_epochs) // chunk_size  # Should be 8
 
@@ -240,6 +271,8 @@ def main():
 			#predict in batch
 			start_time = time.time()
 			current_pred = pipeline.predict(current_features)
+			# sys.exit(1)
+			print(current_pred)
 			# print(current_pred)
 			# print(current_labels)
 			correct_predictions = np.sum(current_pred == current_labels)
@@ -271,7 +304,7 @@ def main():
 		shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
 		scores = cross_val_score(
 			pipeline, test_extracted_features, 
-			labels_predict, 
+			labels_predict['3'], 
 			scoring='accuracy', 
 			cv=shuffle_split_validation
 		)

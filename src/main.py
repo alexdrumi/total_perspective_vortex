@@ -100,17 +100,36 @@ channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 # ]
 
 train = [
-		"../data/S018/S018R03.edf",
-		"../data/S018/S018R07.edf",
-		"../data/S018/S018R11.edf",
 
-		"../data/S028/S028R03.edf",
-		"../data/S028/S028R07.edf",
-		"../data/S028/S028R11.edf",
+		"../data/S016/S016R03.edf",
+		"../data/S016/S016R07.edf",
+		"../data/S016/S016R11.edf",
 
-		"../data/S038/S038R03.edf",
-		"../data/S038/S038R07.edf",
-		"../data/S038/S038R11.edf",
+
+		"../data/S016/S016R04.edf",
+		"../data/S016/S016R08.edf",
+		"../data/S016/S016R12.edf",
+#------------------------
+		# "../data/S017/S017R03.edf",
+		# "../data/S017/S017R07.edf",
+		# "../data/S017/S017R11.edf",
+
+		# "../data/S018/S018R03.edf",
+		# "../data/S018/S018R07.edf",
+		# "../data/S018/S018R11.edf",
+
+		# "../data/S019/S019R03.edf",
+		# "../data/S019/S019R07.edf",
+		# "../data/S019/S019R11.edf",
+
+		
+		# "../data/S028/S028R03.edf",
+		# "../data/S028/S028R07.edf",
+		# "../data/S028/S028R11.edf",
+
+		# "../data/S038/S038R03.edf",
+		# "../data/S038/S038R07.edf",
+		# "../data/S038/S038R11.edf",
 
 
 		# "../data/S048/S048R03.edf",
@@ -131,8 +150,11 @@ train = [
 		# "../data/S078/S078R03.edf",
 		# "../data/S078/S078R07.edf",
 		# "../data/S078/S078R11.edf",
+#------------------------
 
 
+
+		#different freq
 		# "../data/S088/S088R03.edf",
 		# "../data/S088/S088R07.edf",
 		# "../data/S088/S088R11.edf",
@@ -345,6 +367,216 @@ def main():
 		print(type(loaded_raw_data))
 		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #this returns a triplet now
 		print(filtered_data) #this is a dict now
+	
+		epoch_extractor_instance = EpochExtractor()
+		epochs_dict, labels_dict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
+
+
+		run_groups = epoch_extractor_instance.experiments_list
+
+		for groups in run_groups:
+			groups_runs = groups['runs']
+			group_key = f'runs_{"_".join(map(str, groups_runs))}'
+			print(f"\nProcessing group: {group_key} with runs {groups_runs}")
+
+			run_keys = [run_key for run_key in epochs_dict.keys() if int(run_key[-2:]) in groups_runs]
+			available_runs = [run_key for run_key in run_keys if run_key in epochs_dict]
+
+			if not available_runs:
+				print(f"No available runs for group '{group_key}', skipping.")
+				continue
+
+			print(f"  - Available runs for this group: {available_runs}")
+
+			print(run_keys[0])
+
+			feature_extractor_instance = FeatureExtractor()
+			trained_extracted_features = feature_extractor_instance.extract_features(epochs_dict[run_keys[0]]) #callable
+			trained_extracted_labels = labels_dict[run_keys[0]]
+
+			print(f'{trained_extracted_features} are features,\n {trained_extracted_labels} are labels')
+			
+		# sys.exit(1)
+
+		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
+			custom_scaler = CustomScaler()
+			reshaper = Reshaper()
+			my_pca = My_PCA(n_comps=100)
+			mlp_classifier = MLPClassifier(hidden_layer_sizes=(20,10),
+										max_iter=16000,
+										random_state=42
+			)
+		
+			pipeline = Pipeline([
+				('scaler', custom_scaler),
+				('reshaper', reshaper),
+				('pca', my_pca),
+				('classifier', mlp_classifier) #mlp will be replaced in grid search
+			])
+			# print(f"{labels['4'].shape}")
+			# pipeline.fit(trained_extracted_features, trained_extracted_labels)
+
+
+			shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
+
+			# # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
+			# # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_validation)
+			scores = cross_val_score(
+				pipeline, trained_extracted_features, 
+				trained_extracted_labels,  
+				scoring='accuracy', 
+				cv=shuffle_split_validation
+			)
+			
+			print(scores)
+			# print(f'Average accuracy: {scores.mean()}')
+
+
+			# sys.exit(1)
+
+			grid_search_params = [
+				#MLP
+				{
+					'classifier': [MLPClassifier(
+						max_iter=16000,
+						early_stopping=True,
+						n_iter_no_change=100, #if it doesnt improve for 10 epochs
+						verbose=True)],
+					'pca__n_comps': [20,30,42,50],
+					#hidden layers of multilayer perceptron class
+					'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 50)],
+					#relu->helps mitigate vanishing gradients, faster convergence
+					#tanh->hyperbolic tangent, outputs centered around zero
+					'classifier__activation': ['relu', 'tanh'],
+					#adam, efficient for large datasets, adapts learning rates
+					#stochastic gradient, generalize better, slower convergence
+					'classifier__solver': ['adam', 'sgd'],
+					'classifier__learning_rate_init': [0.001, 0.01, 0.1]
+
+				},
+				#SVC
+				{
+					'classifier': [SVC()],
+					'pca__n_comps': [20, 30, 42, 50],
+					'classifier__C': [0.1, 1, 10],
+					'classifier__kernel': ['linear', 'rbf']
+				},
+				
+				# RANDOM FOREST
+				{
+					'classifier': [RandomForestClassifier()],
+					'pca__n_comps': [20,30,42,50],
+					'classifier__n_estimators': [50, 100, 200],
+					'classifier__max_depth': [None, 10, 20]
+				},
+				#DECISION TREE
+				{
+					'pca__n_comps': [20, 30, 42, 50],
+					'classifier': [DecisionTreeClassifier()],
+					'classifier__max_depth': [None, 10, 20],
+					'classifier__min_samples_split': [2, 5, 10]
+				},
+				# Logistic Regression
+				{
+					'classifier': [LogisticRegression()],
+					'pca__n_comps': [20, 30, 42, 50],
+					'classifier__C': [0.1, 1, 10],
+					'classifier__penalty': ['l1', 'l2'],
+					'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
+					'classifier__multi_class': ['auto'],
+					'classifier__max_iter': [1000, 5000]
+				}
+			]
+
+			from sklearn.model_selection import GridSearchCV
+
+			grid_search = GridSearchCV(
+				estimator=pipeline,
+				param_grid=grid_search_params,
+				cv=9,  #9fold cross-val
+				scoring='accuracy',  #evalmetric
+				n_jobs=-1,  #util all all available cpu cores
+				verbose=2,  # For detailed output
+				refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
+			)
+
+			#just to use standard variables
+			X_train = trained_extracted_features
+			y_train = trained_extracted_labels
+			grid_search.fit(X_train, y_train)
+
+			print("Best Parameters:")
+			print(grid_search.best_params_)
+			print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.2f}")
+
+
+			best_pipeline = grid_search.best_estimator_
+			model_filename = f"../models/pipe_{group_key}.joblib"
+
+			joblib.dump(best_pipeline, model_filename)
+
+
+
+
+
+
+
+		sys.exit(1)
+
+	# #------------------------------------------------------------------------------------------------------------
+
+	# predict_raw = dataset_preprocessor_instance.load_raw_data(data_path=predict)
+	# predict_filtered = dataset_preprocessor_instance.filter_raw_data()
+	# epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(predict_filtered)
+
+	# test_extracted_features = feature_extractor_instance.extract_features(epochs_predict) #callable
+
+	except FileNotFoundError as e:
+		logging.error(f"File not found: {e}")
+	except PermissionError as e:
+		logging.error(f"Permission on the file denied: {e}")
+	except IOError as e:
+		logging.error(f"Error reading the data file: {e}")
+	except ValueError as e:
+		logging.error(f"Invalid EDF data: {e}")
+	except TypeError as e:
+			logging.error(f"{e}")
+
+if __name__ == '__main__':
+	main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+def main():
+	try:
+		dataset_preprocessor_instance = Preprocessor()
+		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=train) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
+		# print(dataset_preprocessor_instance.raw_data)
+		print(type(loaded_raw_data))
+		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #this returns a triplet now
+		print(filtered_data) #this is a dict now
 		# print(loaded_raw_data)
 		# sys.exit(1)
 		# for data in filtered_data:
@@ -366,7 +598,9 @@ def main():
 		trained_extracted_features = feature_extractor_instance.extract_features(epochs) #callable
 		# trained_extracted_features = trained_extracted_features['3']
 
-		print(f'{trained_extracted_features}')
+		
+
+		# print(f'{trained_extracted_features}')
 		print(f'{type(trained_extracted_features)} is the feature type, {type(labels)} is the typeoflabels')
 		# print(type(trained_extracted_features))
 
@@ -380,9 +614,12 @@ def main():
 									max_iter=16000,
 									random_state=42
 		)
+		# sys.exit(1)
 
 	#for customscaler 3d shape check
 	
+
+	# for key_nr in range(1,4):
 
 
 		pipeline = Pipeline([
@@ -391,8 +628,10 @@ def main():
 			('pca', my_pca),
 			('classifier', mlp_classifier) #mlp will be replaced in grid search
 		])
-		pipeline.fit(trained_extracted_features, labels['3'])
+		print(f"{labels['4'].shape}")
+		pipeline.fit(trained_extracted_features, labels['4'])
 
+		sys.exit(1)
 
 	# #------------------------------------------------------------------------------------------------------------
 
@@ -409,7 +648,7 @@ def main():
 		# # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_validation)
 		scores = cross_val_score(
 			pipeline, trained_extracted_features, 
-			labels['3'],  
+			labels['4'],  
 			scoring='accuracy', 
 			cv=shuffle_split_validation
 		)
@@ -513,3 +752,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+'''

@@ -150,7 +150,11 @@ class Preprocessor:
 
 				print('3')
 				raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
+				print(f'{raw.info["sfreq"]} IS THE FREQUENCY OF THE RAW WE TRY TO CONCAT')
 
+				#HERE, IF IT CAN NOT BE CONCATTED, WE SKIP IT FOR NOW
+
+				
 				# Add the raw object to the correct list based on the run number
 				if run_nr in [3, 7, 11]:
 					concatted_raw_data_dict['3'].append(raw)

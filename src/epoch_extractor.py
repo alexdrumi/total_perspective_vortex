@@ -180,6 +180,7 @@ class EpochExtractor:
 			for key, raw_data in filtered_eeg_data.items():
 				if raw_data is not None:
 					current_epochs, _ = self.extract_epochs(raw_data)
+					print(f'{_} is sfreq')
 					epochs_for_multiple_files[key] = current_epochs #this will be epochs for now
 
 					current_labels = current_epochs.events[:, 2] -1 #1 or 2 for t1 t2
