@@ -388,15 +388,15 @@ def main():
 
 			print(f"  - Available runs for this group: {available_runs}")
 
-			print(run_keys[0])
 
 			feature_extractor_instance = FeatureExtractor()
 			trained_extracted_features = feature_extractor_instance.extract_features(epochs_dict[run_keys[0]]) #callable
 			trained_extracted_labels = labels_dict[run_keys[0]]
 
 			print(f'{trained_extracted_features} are features,\n {trained_extracted_labels} are labels')
-			
-		# sys.exit(1)
+			print(run_keys)
+
+			sys.exit(1)
 
 		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
 			custom_scaler = CustomScaler()
@@ -417,19 +417,19 @@ def main():
 			# pipeline.fit(trained_extracted_features, trained_extracted_labels)
 
 
-			shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
+			# shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
 
-			# # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
-			# # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_validation)
-			scores = cross_val_score(
-				pipeline, trained_extracted_features, 
-				trained_extracted_labels,  
-				scoring='accuracy', 
-				cv=shuffle_split_validation
-			)
+			# # # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
+			# # # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_validation)
+			# scores = cross_val_score(
+			# 	pipeline, trained_extracted_features, 
+			# 	trained_extracted_labels,  
+			# 	scoring='accuracy', 
+			# 	cv=shuffle_split_validation
+			# )
 			
-			print(scores)
-			# print(f'Average accuracy: {scores.mean()}')
+			# print(scores)
+			# # print(f'Average accuracy: {scores.mean()}')
 
 
 			# sys.exit(1)

@@ -72,44 +72,50 @@ predict = [
 "../data/S098/S098R07.edf",
 "../data/S098/S098R11.edf",
 
-"../data/S051/S051R03.edf",
-"../data/S051/S051R07.edf",
-"../data/S051/S051R11.edf",
+# "../data/S051/S051R03.edf",
+# "../data/S051/S051R07.edf",
+# "../data/S051/S051R11.edf",
 
-"../data/S052/S052R03.edf",
-"../data/S052/S052R07.edf",
-"../data/S052/S052R11.edf",
+# "../data/S052/S052R03.edf",
+# "../data/S052/S052R07.edf",
+# "../data/S052/S052R11.edf",
 
-"../data/S053/S053R03.edf",
-"../data/S053/S053R07.edf",
-"../data/S053/S053R11.edf",
-
-
-
-"../data/S054/S054R03.edf",
-"../data/S054/S054R07.edf",
-"../data/S054/S054R11.edf",
+# "../data/S053/S053R03.edf",
+# "../data/S053/S053R07.edf",
+# "../data/S053/S053R11.edf",
 
 
 
-"../data/S061/S061R03.edf",
-"../data/S061/S061R07.edf",
-"../data/S061/S061R11.edf",
-
-"../data/S062/S062R03.edf",
-"../data/S062/S062R07.edf",
-"../data/S062/S062R11.edf",
-
-"../data/S063/S063R03.edf",
-"../data/S063/S063R07.edf",
-"../data/S063/S063R11.edf",
+# "../data/S054/S054R03.edf",
+# "../data/S054/S054R07.edf",
+# "../data/S054/S054R11.edf",
 
 
 
-"../data/S064/S064R03.edf",
-"../data/S064/S064R07.edf",
-"../data/S064/S064R11.edf",
+# "../data/S061/S061R03.edf",
+# "../data/S061/S061R07.edf",
+# "../data/S061/S061R11.edf",
 
+# "../data/S062/S062R03.edf",
+# "../data/S062/S062R07.edf",
+# "../data/S062/S062R11.edf",
+
+# "../data/S063/S063R03.edf",
+# "../data/S063/S063R07.edf",
+# "../data/S063/S063R11.edf",
+
+
+
+# "../data/S064/S064R03.edf",
+# "../data/S064/S064R07.edf",
+# "../data/S064/S064R11.edf",
+
+
+
+
+"../data/S064/S064R04.edf",
+"../data/S064/S064R08.edf",
+"../data/S064/S064R12.edf",
 #"../data/S017/S017R03.edf",
 #..//data/S013/S013R07.edf",
 #"../data/S013/S013R11.edf",
@@ -236,6 +242,134 @@ def main():
 
 		epoch_extractor_instance = EpochExtractor()
 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
+
+		run_groups = epoch_extractor_instance.experiments_list
+		i = 0
+		for group in run_groups:
+			# pipeline_name = 
+			group_runs = group['runs']
+			group_key = f"runs_{'_'.join(map(str, group_runs))}"
+			models_to_load = f"../models/pipe_{group_key}.joblib" #names of the models to be loaded
+			print(f'{models_to_load} are the models to load, type: {type(models_to_load)}')
+			run_keys = list(set([run_key for run_key in epochs_predict.keys() if int(run_key[-2:]) in group_runs]))
+			available_runs = list[set([run_key for run_key in run_keys if run_key in epochs_predict])]
+			
+			if len(run_keys) == 0:
+				continue
+			
+			# print(run_keys)
+			# # print(available_runs)
+			model_location = models_to_load
+			pipeline = joblib.load(model_location)
+
+
+			feature_extractor_instance = FeatureExtractor()
+			test_extracted_features = feature_extractor_instance.extract_features(epochs_predict[run_keys[0]]) 
+			
+			print(f'epoch nb:	[prediction]	[truth]		equal?')
+			
+			i = 0 
+			true_predictions_per_chunks = []
+			flattened_epochs = [epoch for file_epochs in epochs_predict for epoch in file_epochs]
+			chunk_size = 21  #number of epochs per plot (per datafile)
+			total_chunks = len(flattened_epochs) // chunk_size #chunk is at the moment all the epochs per datafile (21)
+
+			flattened_labels = labels_predict[run_keys[0]]  #already concatenated->for clarity that its flattened
+			print(flattened_labels)
+			chunk_size = 21  # Number of epochs per plot (per file)
+			total_chunks = len(flattened_epochs) // chunk_size  # Should be 8
+
+			true_predictions_per_chunks = []
+			total_correct = 0
+			print(f'epoch nb:	[prediction]	[truth]		equal?')
+
+			#init live plot
+			fig, ax = plt.subplots(figsize=(15, 6))
+			plt.ion()  #turn on interactive mode
+			for chunk_idx in range(total_chunks):
+				start = chunk_idx * chunk_size
+				end = start + chunk_size
+				current_features = test_extracted_features[start:end]
+				current_labels = flattened_labels[start:end]
+				current_epochs = flattened_epochs[start:end]
+
+				#predict in batch
+				start_time = time.time()
+				current_pred = pipeline.predict(current_features)
+				# sys.exit(1)
+				print(current_pred)
+				# print(current_pred)
+				# print(current_labels)
+				correct_predictions = np.sum(current_pred == current_labels)
+				true_predictions_per_chunks.append(correct_predictions)
+				total_correct += correct_predictions
+
+				display_epoch_stats(start, chunk_size, current_pred, current_labels)
+
+				epochs_data = current_epochs #list of (n_channels, n_times)-just for clarity, for now
+				current_batch_accuracy = correct_predictions/len(current_labels)
+				end_time = time.time()
+				total_time_for_current_batch = end_time - start_time
+				print(f'Current accuracy after processing epoch {start}-{end}: {current_batch_accuracy}.\nPrediction of this batch took: {total_time_for_current_batch} seconds of time.')
+				# Plot the current chunk of 21 epochs with true labels and predictions
+				plot_eeg_epochs_chunk(
+					current_batch_idx=chunk_idx,
+					epochs_chunk=epochs_data,
+					labels_chunk=current_labels,
+					predictions_chunk=current_pred,
+					ax=ax,
+					alpha=0.3,          #trnsparency as needed (e.g., 0.3 for higher transparency)
+					linewidth=0.7       #linewidth for thinner lines
+				)
+				time.sleep(3)  #pause for real time plot, if this is too small, the plot will be buggy
+
+
+			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
+			print(f'{total_accuracy_on_this_test_set} is the total accuracy on this test set. Now we test with cross validation.')
+			shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
+			scores = cross_val_score(
+				pipeline, test_extracted_features, 
+				labels_predict[run_keys[0]], 
+				scoring='accuracy', 
+				cv=shuffle_split_validation
+			)
+
+			print(scores)
+			print(f'Average accuracy with cross-validation: {scores.mean()}')
+
+
+	except FileNotFoundError as e:
+		logging.error(f"File not found: {e}")
+	except PermissionError as e:
+		logging.error(f"Permission on the file denied: {e}")
+	except IOError as e:
+		logging.error(f"Error reading the data file: {e}")
+	except ValueError as e:
+		logging.error(f"Invalid EDF data: {e}")
+	
+
+
+if __name__ == "__main__":
+	main()
+
+
+
+
+
+
+
+
+'''
+
+
+def main():
+	try:
+		dataset_preprocessor_instance = Preprocessor()
+		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
+		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #THIS WILL BE INITIAL FILTER TRANSFORMER
+
+		epoch_extractor_instance = EpochExtractor()
+		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 		pipeline = joblib.load('../models/pipe.joblib')
 		
 		feature_extractor_instance = FeatureExtractor()
@@ -326,3 +460,5 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
+'''
