@@ -110,45 +110,45 @@ train = [
 		"../data/S016/S016R08.edf",
 		"../data/S016/S016R12.edf",
 #------------------------
-		# "../data/S017/S017R03.edf",
-		# "../data/S017/S017R07.edf",
-		# "../data/S017/S017R11.edf",
+		"../data/S017/S017R03.edf",
+		"../data/S017/S017R07.edf",
+		"../data/S017/S017R11.edf",
 
-		# "../data/S018/S018R03.edf",
-		# "../data/S018/S018R07.edf",
-		# "../data/S018/S018R11.edf",
+		"../data/S018/S018R03.edf",
+		"../data/S018/S018R07.edf",
+		"../data/S018/S018R11.edf",
 
-		# "../data/S019/S019R03.edf",
-		# "../data/S019/S019R07.edf",
-		# "../data/S019/S019R11.edf",
+		"../data/S019/S019R03.edf",
+		"../data/S019/S019R07.edf",
+		"../data/S019/S019R11.edf",
 
 		
-		# "../data/S028/S028R03.edf",
-		# "../data/S028/S028R07.edf",
-		# "../data/S028/S028R11.edf",
+		"../data/S028/S028R03.edf",
+		"../data/S028/S028R07.edf",
+		"../data/S028/S028R11.edf",
 
-		# "../data/S038/S038R03.edf",
-		# "../data/S038/S038R07.edf",
-		# "../data/S038/S038R11.edf",
-
-
-		# "../data/S048/S048R03.edf",
-		# "../data/S048/S048R07.edf",
-		# "../data/S048/S048R11.edf",
+		"../data/S038/S038R03.edf",
+		"../data/S038/S038R07.edf",
+		"../data/S038/S038R11.edf",
 
 
-		# "../data/S058/S058R03.edf",
-		# "../data/S058/S058R07.edf",
-		# "../data/S058/S058R11.edf",
+		"../data/S048/S048R03.edf",
+		"../data/S048/S048R07.edf",
+		"../data/S048/S048R11.edf",
 
 
-		# "../data/S068/S068R03.edf",
-		# "../data/S068/S068R07.edf",
-		# "../data/S068/S068R11.edf",
+		"../data/S058/S058R03.edf",
+		"../data/S058/S058R07.edf",
+		"../data/S058/S058R11.edf",
 
 
-		# "../data/S078/S078R03.edf",
-		# "../data/S078/S078R07.edf",
+		"../data/S068/S068R03.edf",
+		"../data/S068/S068R07.edf",
+		"../data/S068/S068R11.edf",
+
+
+		"../data/S078/S078R03.edf",
+		"../data/S078/S078R07.edf",
 		# "../data/S078/S078R11.edf",
 #------------------------
 
@@ -206,34 +206,34 @@ train = [
 
 
 
-		# "../data/S038/S038R03.edf",
-		# "../data/S038/S038R07.edf",
-		# "../data/S038/S038R11.edf",
-		# "../data/S038/S038R04.edf",
-		# "../data/S038/S038R08.edf",
-		# "../data/S038/S038R12.edf",
-		# "../data/S038/S038R05.edf",
-		# "../data/S038/S038R09.edf",
-		# "../data/S038/S038R13.edf",
-		# "../data/S038/S038R06.edf",
-		# "../data/S038/S038R10.edf",
-		# "../data/S038/S038R14.edf",
+		"../data/S038/S038R03.edf",
+		"../data/S038/S038R07.edf",
+		"../data/S038/S038R11.edf",
+		"../data/S038/S038R04.edf",
+		"../data/S038/S038R08.edf",
+		"../data/S038/S038R12.edf",
+		"../data/S038/S038R05.edf",
+		"../data/S038/S038R09.edf",
+		"../data/S038/S038R13.edf",
+		"../data/S038/S038R06.edf",
+		"../data/S038/S038R10.edf",
+		"../data/S038/S038R14.edf",
 
-		# "../data/S048/S048R03.edf",
-		# "../data/S048/S048R07.edf",
-		# "../data/S048/S048R11.edf",
-		# "../data/S048/S048R04.edf",
-		# "../data/S048/S048R08.edf",
-		# "../data/S048/S048R12.edf",
-		# "../data/S048/S048R05.edf",
-		# "../data/S048/S048R09.edf",
-		# "../data/S048/S048R13.edf",
-		# "../data/S048/S048R06.edf",
-		# "../data/S048/S048R10.edf",
-		# "../data/S048/S048R14.edf",
+		"../data/S048/S048R03.edf",
+		"../data/S048/S048R07.edf",
+		"../data/S048/S048R11.edf",
+		"../data/S048/S048R04.edf",
+		"../data/S048/S048R08.edf",
+		"../data/S048/S048R12.edf",
+		"../data/S048/S048R05.edf",
+		"../data/S048/S048R09.edf",
+		"../data/S048/S048R13.edf",
+		"../data/S048/S048R06.edf",
+		"../data/S048/S048R10.edf",
+		"../data/S048/S048R14.edf",
 
-		# "../data/S104/S104R03.edf",
-		# "../data/S091/S091R11.edf",
+		"../data/S104/S104R03.edf",
+		"../data/S091/S091R11.edf",
 		# "../data/S091/S091R03.edf",
 		# "../data/S091/S091R07.edf",
 		# "../data/S082/S082R11.edf",
@@ -396,7 +396,7 @@ def main():
 			print(f'{trained_extracted_features} are features,\n {trained_extracted_labels} are labels')
 			print(run_keys)
 
-			sys.exit(1)
+			# sys.exit(1)
 
 		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
 			custom_scaler = CustomScaler()
@@ -521,7 +521,7 @@ def main():
 
 
 
-		sys.exit(1)
+		# sys.exit(1)
 
 	# #------------------------------------------------------------------------------------------------------------
 

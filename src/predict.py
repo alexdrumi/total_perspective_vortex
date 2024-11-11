@@ -260,6 +260,7 @@ def main():
 			# print(run_keys)
 			# # print(available_runs)
 			model_location = models_to_load
+			print(model_location)
 			pipeline = joblib.load(model_location)
 
 
@@ -267,10 +268,14 @@ def main():
 			test_extracted_features = feature_extractor_instance.extract_features(epochs_predict[run_keys[0]]) 
 			
 			print(f'epoch nb:	[prediction]	[truth]		equal?')
-			
+			# sys.exit(1)
+
 			i = 0 
 			true_predictions_per_chunks = []
 			flattened_epochs = [epoch for file_epochs in epochs_predict for epoch in file_epochs]
+			print(flattened_epochs)
+			#this is wrong here, we have the epochs from epochs predict. this is just 3,4 at the moment
+			sys.exit(1)
 			chunk_size = 21  #number of epochs per plot (per datafile)
 			total_chunks = len(flattened_epochs) // chunk_size #chunk is at the moment all the epochs per datafile (21)
 
@@ -286,7 +291,11 @@ def main():
 			#init live plot
 			fig, ax = plt.subplots(figsize=(15, 6))
 			plt.ion()  #turn on interactive mode
+			print(f'{total_chunks} are total chunks')
+			sys.exit(1)
+
 			for chunk_idx in range(total_chunks):
+				print('INSIDE CHUNK INDEX')
 				start = chunk_idx * chunk_size
 				end = start + chunk_size
 				current_features = test_extracted_features[start:end]
@@ -321,7 +330,7 @@ def main():
 					alpha=0.3,          #trnsparency as needed (e.g., 0.3 for higher transparency)
 					linewidth=0.7       #linewidth for thinner lines
 				)
-				time.sleep(3)  #pause for real time plot, if this is too small, the plot will be buggy
+				time.sleep(3000)  #pause for real time plot, if this is too small, the plot will be buggy
 
 
 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
