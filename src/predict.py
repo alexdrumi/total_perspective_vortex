@@ -243,6 +243,7 @@ def main():
 		epoch_extractor_instance = EpochExtractor()
 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 
+		# print(f"{len(epochs_predict['3'])} is epochs predict len, {len(labels_predict['3'])} is labels predict len")
 		run_groups = epoch_extractor_instance.experiments_list
 		i = 0
 		for group in run_groups:
@@ -252,8 +253,12 @@ def main():
 			models_to_load = f"../models/pipe_{group_key}.joblib" #names of the models to be loaded
 			print(f'{models_to_load} are the models to load, type: {type(models_to_load)}')
 			run_keys = list(set([run_key for run_key in epochs_predict.keys() if int(run_key[-2:]) in group_runs]))
+			print(run_keys)
+			time.sleep(5)
+			# sys.exit(1)
 			available_runs = list[set([run_key for run_key in run_keys if run_key in epochs_predict])]
-			
+			# sys.exit(1)
+
 			if len(run_keys) == 0:
 				continue
 			
@@ -266,21 +271,26 @@ def main():
 
 			feature_extractor_instance = FeatureExtractor()
 			test_extracted_features = feature_extractor_instance.extract_features(epochs_predict[run_keys[0]]) 
-			
+			print(f'{test_extracted_features} are test extracted features')
 			print(f'epoch nb:	[prediction]	[truth]		equal?')
 			# sys.exit(1)
 
 			i = 0 
 			true_predictions_per_chunks = []
-			flattened_epochs = [epoch for file_epochs in epochs_predict for epoch in file_epochs]
-			print(flattened_epochs)
+			# flattened_epochs = [epoch for file_epochs in epochs_predict[run_keys[0]] for epoch in file_epochs]
+			flattened_epochs = epochs_predict[run_keys[0]]
+
+			# print(f'{flattened_epochs} ARE FLATTENED EPOCHS, {len(flattened_epochs)} are the length')
+			# sys.exit(1)
+
 			#this is wrong here, we have the epochs from epochs predict. this is just 3,4 at the moment
-			sys.exit(1)
 			chunk_size = 21  #number of epochs per plot (per datafile)
 			total_chunks = len(flattened_epochs) // chunk_size #chunk is at the moment all the epochs per datafile (21)
+			# sys.exit(1)
 
 			flattened_labels = labels_predict[run_keys[0]]  #already concatenated->for clarity that its flattened
-			print(flattened_labels)
+			# print(f'{flattened_labels} are the flattened labels, {len(flattened_labels)} are the len')
+			# sys.exit(1)
 			chunk_size = 21  # Number of epochs per plot (per file)
 			total_chunks = len(flattened_epochs) // chunk_size  # Should be 8
 
@@ -292,7 +302,7 @@ def main():
 			fig, ax = plt.subplots(figsize=(15, 6))
 			plt.ion()  #turn on interactive mode
 			print(f'{total_chunks} are total chunks')
-			sys.exit(1)
+			# sys.exit(1)
 
 			for chunk_idx in range(total_chunks):
 				print('INSIDE CHUNK INDEX')
@@ -330,7 +340,7 @@ def main():
 					alpha=0.3,          #trnsparency as needed (e.g., 0.3 for higher transparency)
 					linewidth=0.7       #linewidth for thinner lines
 				)
-				time.sleep(3000)  #pause for real time plot, if this is too small, the plot will be buggy
+				time.sleep(3)  #pause for real time plot, if this is too small, the plot will be buggy
 
 
 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
