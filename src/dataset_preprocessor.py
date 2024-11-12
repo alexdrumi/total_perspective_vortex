@@ -128,29 +128,29 @@ class Preprocessor:
 			if not file_path.exists():
 				raise FileNotFoundError(f"Data path/file '{file_path}' does not exist.")
 			try:
-				print(f'{file_path} is the filepath')
+				# print(f'{file_path} is the filepath')
 
 				filename = os.path.basename(file_path)
 				filename_without_ext = os.path.splitext(filename)[0]
 				subject_part = filename_without_ext[:4]  # 'S***'
 				run_part = filename_without_ext[4:]
-				print(f'{run_part} is the runpart')
+				# print(f'{run_part} is the runpart')
 
 				if subject_part[0] != 'S' or run_part[0] != 'R':
 					raise ValueError(f"Invalid filename format: '{filename}'")
 
 				run_nr = int(run_part[-2:])
 				subject_id = int(subject_part[1:])
-				print(f'{run_nr} is the runnr')
+				# print(f'{run_nr} is the runnr')
 
 				experiment = self.get_experiment_by_run(run_nr)
 				if not experiment:
 					print(f"Run {run_nr} does not correspond to any experiment, skipping it.")
 					continue
 
-				print('3')
+				# print('3')
 				raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
-				print(f'{raw.info["sfreq"]} IS THE FREQUENCY OF THE RAW WE TRY TO CONCAT')
+				# print(f'{raw.info["sfreq"]} IS THE FREQUENCY OF THE RAW WE TRY TO CONCAT')
 
 				#HERE, IF IT CAN NOT BE CONCATTED, WE SKIP IT FOR NOW
 
@@ -184,7 +184,7 @@ class Preprocessor:
 			if raw_list:  # Only concatenate if the list is not empty
 				concatted_raw_data_dict[key] = mne.concatenate_raws(raw_list)
 			else:
-				print('KEY IS EMPTY')
+				# print('KEY IS EMPTY')
 				concatted_raw_data_dict[key] = None  # Or handle empty lists as needed
 
 		return concatted_raw_data_dict
