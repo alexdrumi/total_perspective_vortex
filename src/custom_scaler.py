@@ -11,12 +11,11 @@ class CustomScaler(BaseEstimator, TransformerMixin):
 
 
 	def fit(self, X: np.ndarray, y=None):
-		#in case x is not 3d
 		if not isinstance(X, np.ndarray) or X.ndim !=3:
 			raise TypeError('Input X must be a 3D np.ndarray: ')
 		for i in range(X.shape[1]):
 			scaler = StandardScaler()
-			scaler.fit(X[:, i, :].reshape(-1, X.shape[2])) #not entirely surte about these dimensions
+			scaler.fit(X[:, i, :].reshape(-1, X.shape[2]))
 			self.scalers[i] = scaler
 		return self
 	
@@ -25,12 +24,10 @@ class CustomScaler(BaseEstimator, TransformerMixin):
 	def transform(self, X: np.ndarray):
 		x_copy = X.copy()
 		for i in range(X.shape[1]):
-			#use the previously saved scalers, this will be called when using predict as well
 			x_copy[:, i, :] = self.scalers[i].transform(X[:, i, :])
 		return x_copy
 
 
 
 	def fit_transform(self, X:np.ndarray, y=None):
-		#during training this function is called first in the pipeline
 		return self.fit(X, y).transform(X)

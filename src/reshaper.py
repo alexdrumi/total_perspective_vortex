@@ -16,5 +16,4 @@ class Reshaper(BaseEstimator, TransformerMixin):
 		return self
 	
 	def transform(self, X:np.ndarray) -> np.ndarray:
-		#flatten the last two dimensions (channels,time points) into a single feature dimension
 		return X.reshape((X.shape[0], -1))

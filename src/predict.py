@@ -14,7 +14,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold
 
 from dataset_preprocessor import Preprocessor
-# from epoch_processor import EpochProcessor
 from feature_extractor import FeatureExtractor
 
 import joblib
@@ -31,17 +30,17 @@ from reshaper import Reshaper
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
-#file handler - Logs to a file
+
 file_handler = logging.FileHandler('../logs/error_log.log', mode='w')
 file_handler.setLevel(logging.ERROR)
-#stream handler - Logs to terminal (console)
+
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setLevel(logging.ERROR)
-#format for log messages
+
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
 stream_handler.setFormatter(formatter)
-#add handlers to the logger
+
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
@@ -93,29 +92,28 @@ predict = [
 	# "../data/S029/S029R06.edf",
 ]
 #-------------------------------------------------------
+
 def concatenate_all_epochs(epochs_chunk, labels_chunk, predictions_chunk):
 	'''
 	return concatenated epochs and alsoo event times
 	'''
 	n_epochs = len(epochs_chunk)
-	epoch_duration = 7.1  #seconds -2.1+5 (whole range for features per epoch)
+	epoch_duration = 7.1
 	total_duration = n_epochs * epoch_duration
 
 	concatenated_data = []
-	event_times = []  #to mark epoch boundaries
-	concatenated_labels = []  #to store labels for annotations
-	concatenated_predictions = []  #to store predictions for annotations
+	event_times = []
+	concatenated_labels = []
+	concatenated_predictions = []
 
 	for idx, (epoch, label, pred) in enumerate(zip(epochs_chunk, labels_chunk, predictions_chunk)):
-		# epoch is an np array of shape (n_channels, n_times)
-		mean_data = epoch.mean(axis=0)  #mean across channels; shape: (n_times,)
+		mean_data = epoch.mean(axis=0)
 		concatenated_data.append(mean_data)
 		event_times.append(idx * epoch_duration)
 		concatenated_labels.append(label)
 		concatenated_predictions.append(pred)
 
-	#concat all epochs data
-	concatenated_data = np.concatenate(concatenated_data)  #shape: (n_epochs * n_times,)
+	concatenated_data = np.concatenate(concatenated_data)
 	return concatenated_data, event_times
 
 
@@ -133,24 +131,21 @@ def plot_eeg_epochs_chunk(current_batch_idx, epochs_chunk, labels_chunk, predict
 	- linewidth: Width of the EEG signal line (default is 0.7)
 	"""
 	n_epochs = len(epochs_chunk)
-	epoch_duration = 7.1  # seconds
+	epoch_duration = 7.1
 	total_duration = n_epochs * epoch_duration
-	concatenated_data, event_times = concatenate_all_epochs(epochs_chunk, labels_chunk, predictions_chunk)   #shape: (n_epochs * n_times,) 	->concatenate all epochs data, for efficiency also extract the event times within the same loop
+	concatenated_data, event_times = concatenate_all_epochs(epochs_chunk, labels_chunk, predictions_chunk)
 
-	#create a time array
 	times = np.linspace(0, total_duration, concatenated_data.shape[0])
 
-	ax.clear() #everytime we clear the plot, like this there will be no popup in each loop
-	ax.plot(times, concatenated_data, label='EEG Signal', alpha=alpha, linewidth=linewidth) #plot the concatenated data with adjusted alpha and linewidth
+	ax.clear()
+	ax.plot(times, concatenated_data, label='EEG Signal', alpha=alpha, linewidth=linewidth)
 
-	#add vertical dashed lines to separate epoch boundaries
 	for event_time in event_times:
 		ax.axvline(x=event_time, color='gray', linestyle='--', linewidth=0.5)
 
-	y_min, y_max = ax.get_ylim() #determine y-pos for annotations
-	annotation_y = y_max - 0.05 * (y_max - y_min)  #slightly below the top
+	y_min, y_max = ax.get_ylim()
+	annotation_y = y_max - 0.05 * (y_max - y_min)
 
-	#annotate each epoch with true and predicted labels
 	for idx, event_time in enumerate(event_times):
 		true_label = label_names[1] if labels_chunk[idx] == 0 else label_names[2]
 		predicted_label = label_names[1] if predictions_chunk[idx] == 0 else label_names[2]
@@ -158,18 +153,17 @@ def plot_eeg_epochs_chunk(current_batch_idx, epochs_chunk, labels_chunk, predict
 		annotation = f"{true_label}\n----------------\n{predicted_label}"
 		color = 'green' if is_correct else 'red'
 		ax.text(
-			event_time + epoch_duration / 2,  #position at the center of the epoch
-			annotation_y,                     #fixed y-position for alignment
+			event_time + epoch_duration / 2,
+			annotation_y,
 			annotation,
 			horizontalalignment='center',
-			verticalalignment='bottom',        #align text to bottom
+			verticalalignment='bottom',
 			fontsize=4,
 			fontweight='bold',
 			color=color,
 			bbox=dict(facecolor='white', alpha=0.5, edgecolor='none', pad=1)
 		)
 
-	#optional: adjust y-limits to provide space for annotations
 	padding = 0.1 * (y_max - y_min)
 	ax.set_ylim(y_min, y_max + padding)
 
@@ -179,7 +173,7 @@ def plot_eeg_epochs_chunk(current_batch_idx, epochs_chunk, labels_chunk, predict
 	ax.grid(True)
 	ax.legend(loc='upper right', fontsize=8)
 	plt.draw()
-	plt.pause(1) #this was the problem, the pause didnt give it enough time to update ax
+	plt.pause(1)
 
 
 
@@ -190,14 +184,13 @@ def display_epoch_stats(start, chunk_size, current_pred, current_labels):
 		truth = current_labels[i]
 		is_correct = prediction == truth
 		outcome = 'Left' if truth == 0 else 'Right'
-		# print(f'epoch {epoch_num}: Prediction={prediction} | Truth={truth} ({outcome}) | Correct={is_correct}')
 
 
 def main():
 	try:
 		dataset_preprocessor_instance = Preprocessor()
-		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
-		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #THIS WILL BE INITIAL FILTER TRANSFORMER
+		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict)
+		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data)
 
 		epoch_extractor_instance = EpochExtractor()
 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
@@ -205,10 +198,9 @@ def main():
 
 		i = 0
 		for group in run_groups:
-			# pipeline_name = 
 			group_runs = group['runs']
 			group_key = f"runs_{'_'.join(map(str, group_runs))}"
-			models_to_load = f"../models/pipe_{group_key}.joblib" #names of the models to be loaded
+			models_to_load = f"../models/pipe_{group_key}.joblib"
 			run_keys = list(set([run_key for run_key in epochs_predict.keys() if int(run_key[-2:]) in group_runs]))
 			time.sleep(5)
 			available_runs = list[set([run_key for run_key in run_keys if run_key in epochs_predict])]
@@ -231,18 +223,17 @@ def main():
 
 			i = 0 
 			flattened_epochs = epochs_predict[run_keys[0]]
-			flattened_labels = labels_predict[run_keys[0]]  #already concatenated->for clarity that its flattened
+			flattened_labels = labels_predict[run_keys[0]]
 
-			chunk_size = 15  # Number of epochs per plot (per file)
+			chunk_size = 15
 			true_predictions_per_chunks = []
-			total_chunks = len(flattened_epochs) // chunk_size #chunk is at the moment all the epochs per datafile (21)
+			total_chunks = len(flattened_epochs) // chunk_size
 			true_predictions_per_chunks = []
 			total_correct = 0
 			print(f'epoch nb:	[prediction]	[truth]		equal?')
 
-			#init live plot
 			fig, ax = plt.subplots(figsize=(15, 6))
-			plt.ion()  #turn on interactive mode
+			plt.ion()
 
 			for chunk_idx in range(total_chunks):
 				start = chunk_idx * chunk_size
@@ -251,7 +242,6 @@ def main():
 				current_labels = flattened_labels[start:end]
 				current_epochs = flattened_epochs[start:end]
 
-				#predict in batch
 				start_time = time.time()
 				current_pred = pipeline.predict(current_features)
 				
@@ -259,9 +249,7 @@ def main():
 				true_predictions_per_chunks.append(correct_predictions)
 				total_correct += correct_predictions
 
-				# display_epoch_stats(start, chunk_size, current_pred, current_labels)
-
-				epochs_data = current_epochs #list of (n_channels, n_times)-just for clarity, for now
+				epochs_data = current_epochs
 				current_batch_accuracy = correct_predictions/len(current_labels)
 				end_time = time.time()
 				total_time_for_current_batch = end_time - start_time
@@ -275,15 +263,15 @@ def main():
 					predictions_chunk=current_pred,
 					label_names=label_names,
 					ax=ax,
-					alpha=0.3,          #trnsparency as needed (e.g., 0.3 for higher transparency)
-					linewidth=0.7       #linewidth for thinner lines
+					alpha=0.3,
+					linewidth=0.7
 				)
-				time.sleep(3)  #pause for real time plot, if this is too small, the plot will be buggy
+				time.sleep(3)
 
 
 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
 			print(f'{total_accuracy_on_this_test_set} is the total accuracy on this test set. Now we test with cross validation.')
-			
+	
 			shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
 			scores = cross_val_score(
 				pipeline, test_extracted_features, 
@@ -294,6 +282,7 @@ def main():
 
 			print(scores)
 			print(f'Average accuracy with cross-validation for group:{group_runs}: {scores.mean()}')
+
 
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")

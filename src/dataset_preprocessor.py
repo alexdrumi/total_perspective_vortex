@@ -15,7 +15,6 @@ TODO:
 
 class Preprocessor:
 	def __init__(self):
-		# self.data_channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 		self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 		self.raw_data = []
 		self.experiments_list = [
@@ -59,103 +58,30 @@ class Preprocessor:
 			'5': [],
 			'6': []
 		}
-		#also concatenate the ones which have same names (same runtypes)
-		# for file_path in data_path:
-		# 	file_path = Path(file_path)  #convert each individual path to a Path object
-		# 	if not file_path.exists():
-		# 		raise FileNotFoundError(f"Data path/file '{file_path}' does not exist.")
-		# 	try:
-		# 		print(f'{file_path} is the filepath')
-
-		# 		filename = os.path.basename(file_path)
-		# 		filename_without_ext = os.path.splitext(filename)[0]
-		# 		subject_part = filename_without_ext[:4]  #'S***'->see in data folder
-		# 		run_part = filename_without_ext[4:]
-		# 		print(f'{run_part} is the runpart')
-
-		# 		# print(subject_part)
-		# 		# print(run_part)
-		# 		#in case someone w upload different data, check for names
-		# 		print('1')
-		# 		if subject_part[0] != 'S' or run_part[0] != 'R':
-		# 			raise ValueError(f"Invalid filename format: '{filename}'")
-
-		# 		print('2')
-		# 		run_nr = int(run_part[-2:]) #Snrnrnr
-		# 		subject_id = int(subject_part[1:]) #already extracted above from 4:
-		# 		print(f'{run_nr} is the runnr')
-		# 		#get the experiment based on the run number
-		# 		experiment = self.get_experiment_by_run(run_nr)
-		# 		if not experiment:
-		# 			print(f"Run {run_nr} does not correspond to any experiment, skipping it.")
-		# 			continue
-		# 		print('3')
-		# 		raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
-		# 		if (run_nr == 3 or run_nr == 7 or run_nr == 11):
-		# 			print('inside if statement')
-
-		# 			concatted_raw_data_dict['3'].append(raw)
-
-		# 		print(f'{concatted_raw_data_dict["3"]} is the rawdatadict')
-		# 		available_channels = raw.ch_names
-		# 		if not all(channel in available_channels for channel in self.data_channels):
-		# 			raise ValueError(f"File '{file_path}' does not contain the expected channels: {self.data_channels}")
-				
-		# 		# self.raw_data.append((raw, experiment, subject_id))
-		# 		loaded_raw_data.append((raw, experiment, subject_id))
-		# 		print('4')
-
-
-		# 	except PermissionError:
-		# 		raise PermissionError(f"Permission denied: Unable to access '{file_path}'. Check file permissions.")
-		# 	except IOError as e:
-		# 		raise IOError(f"Error reading file '{file_path}': {e}")
-		# 	except ValueError as ve:
-		# 		raise ValueError(f"Invalid EDF file: {ve}")
-		# 	print('5')
-		# 	# return self.raw_data
-		# 	for key, raw_list in concatted_raw_data_dict.items():
-		# 		print('inside loop')
-		# 		if raw_list:
-		# 			print(raw_list)
-		# 			# concatted_raw_data_dict[key] = mne.concatenate_raws(raw_list)
-		
-		# return (concatted_raw_data_dict['3']) 
-		# #, concatted_raw_data_dict['4'], concatted_raw_data_dict['5'], concatted_raw_data_dict['6'])
-		# # return loaded_raw_data
+	
 		for file_path in data_path:
-			file_path = Path(file_path)  # Convert each individual path to a Path object
+			file_path = Path(file_path) 
 			if not file_path.exists():
 				raise FileNotFoundError(f"Data path/file '{file_path}' does not exist.")
 			try:
-				# print(f'{file_path} is the filepath')
-
 				filename = os.path.basename(file_path)
 				filename_without_ext = os.path.splitext(filename)[0]
-				subject_part = filename_without_ext[:4]  # 'S***'
+				subject_part = filename_without_ext[:4]
 				run_part = filename_without_ext[4:]
-				# print(f'{run_part} is the runpart')
 
 				if subject_part[0] != 'S' or run_part[0] != 'R':
 					raise ValueError(f"Invalid filename format: '{filename}'")
 
 				run_nr = int(run_part[-2:])
 				subject_id = int(subject_part[1:])
-				# print(f'{run_nr} is the runnr')
 
 				experiment = self.get_experiment_by_run(run_nr)
 				if not experiment:
 					print(f"Run {run_nr} does not correspond to any experiment, skipping it.")
 					continue
 
-				# print('3')
 				raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
-				# print(f'{raw.info["sfreq"]} IS THE FREQUENCY OF THE RAW WE TRY TO CONCAT')
-
-				#HERE, IF IT CAN NOT BE CONCATTED, WE SKIP IT FOR NOW
-
-				
-				# Add the raw object to the correct list based on the run number
+			
 				if run_nr in [3, 7, 11]:
 					concatted_raw_data_dict['3'].append(raw)
 				elif run_nr in [4, 8, 12]:
@@ -169,7 +95,6 @@ class Preprocessor:
 				if not all(channel in available_channels for channel in self.data_channels):
 					raise ValueError(f"File '{file_path}' does not contain the expected channels: {self.data_channels}")
 
-				# Add tuple to loaded_raw_data with raw, experiment, subject_id
 				loaded_raw_data.append((raw, experiment, subject_id))
 
 			except PermissionError:
@@ -179,13 +104,11 @@ class Preprocessor:
 			except ValueError as ve:
 				raise ValueError(f"Invalid EDF file: {ve}")
 
-		# After processing all files, concatenate raws in each list in concatted_raw_data_dict
 		for key, raw_list in concatted_raw_data_dict.items():
-			if raw_list:  # Only concatenate if the list is not empty
+			if raw_list:
 				concatted_raw_data_dict[key] = mne.concatenate_raws(raw_list)
 			else:
-				# print('KEY IS EMPTY')
-				concatted_raw_data_dict[key] = None  # Or handle empty lists as needed
+				concatted_raw_data_dict[key] = None
 
 		return concatted_raw_data_dict
 
