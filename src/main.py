@@ -3,45 +3,31 @@ import numpy as np
 import mne
 import sys
 import matplotlib.pyplot as plt
+import joblib
+import logging
+from pathlib import Path
 
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, FunctionTransformer
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.model_selection import ShuffleSplit
-from sklearn.model_selection import cross_val_score, KFold
+from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold, GridSearchCV
 
 from dataset_preprocessor import Preprocessor
 from feature_extractor import FeatureExtractor
-
-
-import joblib
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.svm import SVC
-
-
-# from epoch_extractor import epoch_extractooor, extract_epochs
-# from feature_extractor import feature_extractor, create_feature_vectors, calculate_mean_power_energy
-
 from pca import My_PCA
-from sklearn.preprocessing import FunctionTransformer
 from epoch_extractor import EpochExtractor
-
-
 from custom_scaler import CustomScaler
 from reshaper import Reshaper
 
-import logging
-from pathlib import Path
-
-#configure the logger
-#set up logging to both file and terminal (console)
+#logger config
+#logging for both file and console
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
@@ -53,19 +39,17 @@ file_handler.setLevel(logging.ERROR)
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setLevel(logging.ERROR)
 
-#format for log messages
+#formatfor log messages
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
 stream_handler.setFormatter(formatter)
 
-#add handlers to the logger
+#handlers to the logger
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-
-
-
 mne.set_log_level(verbose='WARNING')
+
 channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 # channels = ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
             # "CP3",
@@ -133,7 +117,6 @@ train = [
 	"../data/S010/S010R07.edf",
 	"../data/S010/S010R11.edf",
 	"../data/S011/S011R03.edf",
-
 	# "../data/S011/S011R07.edf",
 	# "../data/S011/S011R11.edf",
 	# "../data/S012/S012R03.edf",
@@ -660,13 +643,13 @@ train = [
 	"../data/S023/S023R14.edf",
 	"../data/S024/S024R06.edf",
 	"../data/S024/S024R10.edf",
-	# "../data/S024/S024R14.edf",
-	# "../data/S025/S025R06.edf",
-	# "../data/S025/S025R10.edf",
-	# "../data/S025/S025R14.edf",
-	# "../data/S026/S026R06.edf",
-	# "../data/S026/S026R10.edf",
-	# "../data/S026/S026R14.edf",
+	"../data/S024/S024R14.edf",
+	"../data/S025/S025R06.edf",
+	"../data/S025/S025R10.edf",
+	"../data/S025/S025R14.edf",
+	"../data/S026/S026R06.edf",
+	"../data/S026/S026R10.edf",
+	"../data/S026/S026R14.edf",
 	# "../data/S027/S027R06.edf",
 	# "../data/S027/S027R10.edf",
 	# "../data/S027/S027R14.edf",
@@ -1154,17 +1137,12 @@ def main():
 	try:
 		dataset_preprocessor_instance = Preprocessor()
 		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=train) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
-		# print(dataset_preprocessor_instance.raw_data)
-		print(type(loaded_raw_data))
 		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #this returns a triplet now
-		print(filtered_data) #this is a dict now
 	
 		epoch_extractor_instance = EpochExtractor()
 		epochs_dict, labels_dict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
-
-
+		
 		run_groups = epoch_extractor_instance.experiments_list
-
 		for groups in run_groups:
 			groups_runs = groups['runs']
 			group_key = f'runs_{"_".join(map(str, groups_runs))}'
@@ -1177,19 +1155,12 @@ def main():
 				print(f"No available runs for group '{group_key}', skipping.")
 				continue
 
-			# print(f"  - Available runs for this group: {available_runs}")
-
-
 			feature_extractor_instance = FeatureExtractor()
 			trained_extracted_features = feature_extractor_instance.extract_features(epochs_dict[run_keys[0]]) #callable
 			trained_extracted_labels = labels_dict[run_keys[0]]
 
-			# print(f'{trained_extracted_features} are features,\n {trained_extracted_labels} are labels')
-			# print(run_keys)
 
-			# sys.exit(1)
-
-		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
+			#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
 			custom_scaler = CustomScaler()
 			reshaper = Reshaper()
 			my_pca = My_PCA(n_comps=100)
@@ -1204,12 +1175,8 @@ def main():
 				('pca', my_pca),
 				('classifier', mlp_classifier) #mlp will be replaced in grid search
 			])
-			# print(f"{labels['4'].shape}")
 			# pipeline.fit(trained_extracted_features, trained_extracted_labels)
-
-
 			# shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
-
 			# # # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
 			# # # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_)
 			# scores = cross_val_score(
@@ -1223,7 +1190,6 @@ def main():
 			# print(f'Average accuracy: {scores.mean()}')
 
 
-			# sys.exit(1)
 
 			grid_search_params = [
 				#MLP
@@ -1279,7 +1245,6 @@ def main():
 				}
 			]
 
-			from sklearn.model_selection import GridSearchCV
 
 			grid_search = GridSearchCV(
 				estimator=pipeline,
