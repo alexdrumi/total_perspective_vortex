@@ -9,22 +9,22 @@ class EpochExtractor:
 		self.experiments_list = [
 			{
 				"runs": [3,7,11],
-				"mapping": {0: "rest", 1: "left f.", 2: "right f."},
+				"mapping": {0: "rest", 1: "left fist", 2: "right fist"},
 				"event_id": {"left fist": 2, "right fist": 3},
 			},
 			{
 				"runs": [4,8,12],
-				"mapping": {0: "rest", 1: "left im.", 2: "right im."},
+				"mapping": {0: "rest", 1: "left imagined", 2: "right imagined"},
 				"event_id": {"left fist imagined": 4, "right fist imagined": 5},
 			},
 			{
 				"runs": [5,9,13],
-				"mapping": {0: "rest", 1: "both fi.", 2: "both fe."},
+				"mapping": {0: "rest", 1: "both fists", 2: "both feet"},
 				"event_id": {"both fists": 6, "both feet": 7},
 			},
 			 {
 				"runs": [6, 10, 14],
-				"mapping": {0: "rest", 1: "both fi. im.", 2: "both fe. im."},
+				"mapping": {0: "rest", 1: "both fists imagined", 2: "both feet imagined"},
 				"event_id": {"imagine both fists": 8, "imagine both feet": 9},
 			},
 		]

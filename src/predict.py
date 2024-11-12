@@ -54,43 +54,43 @@ predict = [
 	"../data/S020/S020R03.edf",
 	"../data/S020/S020R07.edf",
 	"../data/S020/S020R11.edf",
-	"../data/S021/S021R03.edf",
-	"../data/S021/S021R07.edf",
-	"../data/S021/S021R11.edf",
-	"../data/S022/S022R03.edf",
-	"../data/S022/S022R07.edf",
-	"../data/S022/S022R11.edf",
+	# "../data/S021/S021R03.edf",
+	# "../data/S021/S021R07.edf",
+	# "../data/S021/S021R11.edf",
+	# "../data/S022/S022R03.edf",
+	# "../data/S022/S022R07.edf",
+	# "../data/S022/S022R11.edf",
 
 	#4,8,12
 	"../data/S011/S011R08.edf",
 	"../data/S011/S011R12.edf",
 	"../data/S012/S012R04.edf",
-	"../data/S012/S012R08.edf",
-	"../data/S012/S012R12.edf",
-	"../data/S013/S013R04.edf",
-	"../data/S013/S013R08.edf",
-	"../data/S013/S013R12.edf",
+	# "../data/S012/S012R08.edf",
+	# "../data/S012/S012R12.edf",
+	# "../data/S013/S013R04.edf",
+	# "../data/S013/S013R08.edf",
+	# "../data/S013/S013R12.edf",
 
 
 	#5,9,13
 	"../data/S011/S011R09.edf",
 	"../data/S011/S011R13.edf",
 	"../data/S012/S012R05.edf",
-	"../data/S012/S012R09.edf",
-	"../data/S012/S012R13.edf",
-	"../data/S013/S013R05.edf",
-	"../data/S013/S013R09.edf",
-	"../data/S013/S013R13.edf",
+	# "../data/S012/S012R09.edf",
+	# "../data/S012/S012R13.edf",
+	# "../data/S013/S013R05.edf",
+	# "../data/S013/S013R09.edf",
+	# "../data/S013/S013R13.edf",
 
 
 	#6,10,14
 	"../data/S027/S027R06.edf",
 	"../data/S027/S027R10.edf",
 	"../data/S027/S027R14.edf",
-	"../data/S028/S028R06.edf",
-	"../data/S028/S028R10.edf",
-	"../data/S028/S028R14.edf",
-	"../data/S029/S029R06.edf",
+	# "../data/S028/S028R06.edf",
+	# "../data/S028/S028R10.edf",
+	# "../data/S028/S028R14.edf",
+	# "../data/S029/S029R06.edf",
 ]
 #-------------------------------------------------------
 def concatenate_all_epochs(epochs_chunk, labels_chunk, predictions_chunk):
@@ -155,7 +155,7 @@ def plot_eeg_epochs_chunk(current_batch_idx, epochs_chunk, labels_chunk, predict
 		true_label = label_names[1] if labels_chunk[idx] == 0 else label_names[2]
 		predicted_label = label_names[1] if predictions_chunk[idx] == 0 else label_names[2]
 		is_correct = (labels_chunk[idx] == predictions_chunk[idx])
-		annotation = f"{true_label}\n{predicted_label}"
+		annotation = f"{true_label}\n----------------\n{predicted_label}"
 		color = 'green' if is_correct else 'red'
 		ax.text(
 			event_time + epoch_duration / 2,  #position at the center of the epoch
@@ -163,7 +163,7 @@ def plot_eeg_epochs_chunk(current_batch_idx, epochs_chunk, labels_chunk, predict
 			annotation,
 			horizontalalignment='center',
 			verticalalignment='bottom',        #align text to bottom
-			fontsize=6,
+			fontsize=4,
 			fontweight='bold',
 			color=color,
 			bbox=dict(facecolor='white', alpha=0.5, edgecolor='none', pad=1)
