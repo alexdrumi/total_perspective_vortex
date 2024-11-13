@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold
+from sklearn.model_selection import KFold
 
 from dataset_preprocessor import Preprocessor
 from feature_extractor import FeatureExtractor
@@ -272,16 +273,25 @@ def main():
 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
 			print(f'{total_accuracy_on_this_test_set} is the total accuracy on this test set. Now we test with cross validation.')
 	
-			shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
+			# shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
+			# scores = cross_val_score(
+			# 	pipeline, test_extracted_features, 
+			# 	labels_predict[run_keys[0]], 
+			# 	scoring='accuracy', 
+			# 	cv=shuffle_split_validation
+			# )
+
+
+			kfold = KFold(n_splits=5, shuffle=True, random_state=0)
 			scores = cross_val_score(
 				pipeline, test_extracted_features, 
 				labels_predict[run_keys[0]], 
 				scoring='accuracy', 
-				cv=shuffle_split_validation
+				cv=kfold
 			)
 
 			print(scores)
-			print(f'Average accuracy with cross-validation for group:{group_runs}: {scores.mean()}')
+			print(f"\033[92mAverage accuracy with cross-validation for group: {group_runs}: {scores.mean():.2f}\033[0m")
 
 		# time.sleep()
 	except FileNotFoundError as e:

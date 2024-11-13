@@ -1279,7 +1279,7 @@ def main():
 			y_train = trained_extracted_labels
 
 			mlflow.set_tracking_uri("http://localhost:5000")  #uri
-			print(mlflow.get_tracking_uri())  #should have a uri output, do i have to start mlflow before?
+			print(f'Waiting for you to launch in a console: mlflow ui, then you can go to: {mlflow.get_tracking_uri()})')  #should have a uri output, do i have to start mlflow before?
 
 			with mlflow.start_run(run_name=group_key):
 				grid_search.fit(X_train, y_train)

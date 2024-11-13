@@ -3,8 +3,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Paths to clean
 VENV_DIR="${SCRIPT_DIR}/venv"
-MLFLOW_DIR="${SCRIPT_DIR}/src/mlartifacts"
+MLFLOW_1_DIR="${SCRIPT_DIR}/src/mlartifacts"
+MLFLOW_2_DIR="${SCRIPT_DIR}/mlartifacts"
+
 MLRUNS_DIR="${SCRIPT_DIR}/mlruns"
+
 PHYSIONET_DIR="${SCRIPT_DIR}/physionet.org"
 MODELS_DIR="${SCRIPT_DIR}/models"
 
@@ -28,11 +31,18 @@ cleanup() {
     fi
 
     # Remove the MLFLOW directory
-    if [ -d "$MLFLOW_DIR" ]; then
-        echo "Removing MLFLOW directory at $MLFLOW_DIR..."
-        rm -rf "$MLFLOW_DIR"
+    if [ -d "$MLFLOW_2_DIR" ]; then
+        echo "Removing MLFLOW directory at $MLFLOW_2_DIR..."
+        rm -rf "$MLFLOW_2_DIR"
     else
-        echo "MLFLOW directory not found at $MLFLOW_DIR."
+        echo "MLFLOW directory not found at $MLFLOW_2_DIR."
+    fi
+
+    if [ -d "$MLFLOW_1_DIR" ]; then
+        echo "Removing MLFLOW directory at $MLFLOW_1_DIR..."
+        rm -rf "$MLFLOW_1_DIR"
+    else
+        echo "MLFLOW directory not found at $MLFLOW_1_DIR."
     fi
 
     if [ -d "$MLRUNS_DIR" ]; then
