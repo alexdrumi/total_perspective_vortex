@@ -50,46 +50,46 @@ channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 predict = [
 
 	#3,7,11
-	"../data/S020/S020R03.edf",
-	"../data/S020/S020R07.edf",
-	"../data/S020/S020R11.edf",
-	# "../data/S021/S021R03.edf",
-	# "../data/S021/S021R07.edf",
-	# "../data/S021/S021R11.edf",
-	# "../data/S022/S022R03.edf",
-	# "../data/S022/S022R07.edf",
-	# "../data/S022/S022R11.edf",
+	"../data/S030/S030R03.edf",
+	"../data/S030/S030R07.edf",
+	"../data/S030/S030R11.edf",
+	"../data/S031/S031R03.edf",
+	"../data/S031/S031R07.edf",
+	"../data/S031/S031R11.edf",
+	"../data/S032/S032R03.edf",
+	"../data/S032/S032R07.edf",
+	"../data/S032/S032R11.edf",
 
 	#4,8,12
-	"../data/S011/S011R08.edf",
-	"../data/S011/S011R12.edf",
-	"../data/S012/S012R04.edf",
-	# "../data/S012/S012R08.edf",
-	# "../data/S012/S012R12.edf",
-	# "../data/S013/S013R04.edf",
-	# "../data/S013/S013R08.edf",
-	# "../data/S013/S013R12.edf",
+	"../data/S031/S031R08.edf",
+	"../data/S031/S031R12.edf",
+	"../data/S032/S032R04.edf",
+	"../data/S032/S032R08.edf",
+	"../data/S032/S032R12.edf",
+	"../data/S033/S033R04.edf",
+	"../data/S033/S033R08.edf",
+	"../data/S033/S033R12.edf",
 
 
 	#5,9,13
-	"../data/S011/S011R09.edf",
-	"../data/S011/S011R13.edf",
-	"../data/S012/S012R05.edf",
-	# "../data/S012/S012R09.edf",
-	# "../data/S012/S012R13.edf",
-	# "../data/S013/S013R05.edf",
-	# "../data/S013/S013R09.edf",
-	# "../data/S013/S013R13.edf",
+	"../data/S031/S031R09.edf",
+	"../data/S031/S031R13.edf",
+	"../data/S032/S032R05.edf",
+	"../data/S032/S032R09.edf",
+	"../data/S032/S032R13.edf",
+	"../data/S033/S033R05.edf",
+	"../data/S033/S033R09.edf",
+	"../data/S033/S033R13.edf",
 
 
 	#6,10,14
-	"../data/S027/S027R06.edf",
-	"../data/S027/S027R10.edf",
-	"../data/S027/S027R14.edf",
-	# "../data/S028/S028R06.edf",
-	# "../data/S028/S028R10.edf",
-	# "../data/S028/S028R14.edf",
-	# "../data/S029/S029R06.edf",
+	"../data/S037/S037R06.edf",
+	"../data/S037/S037R10.edf",
+	"../data/S037/S037R14.edf",
+	"../data/S038/S038R06.edf",
+	"../data/S038/S038R10.edf",
+	"../data/S038/S038R14.edf",
+	"../data/S039/S039R06.edf",
 ]
 #-------------------------------------------------------
 
@@ -283,7 +283,7 @@ def main():
 			print(scores)
 			print(f'Average accuracy with cross-validation for group:{group_runs}: {scores.mean()}')
 
-
+		# time.sleep()
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")
 	except PermissionError as e:

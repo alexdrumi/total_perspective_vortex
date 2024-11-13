@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import joblib
 import logging
 from pathlib import Path
+import time
 
 from sklearn.preprocessing import StandardScaler, FunctionTransformer
 from sklearn.decomposition import PCA
@@ -18,6 +19,10 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold, GridSearchCV
+
+import mlflow
+import mlflow.sklearn
+from mlflow.models.signature import infer_signature
 
 from dataset_preprocessor import Preprocessor
 from feature_extractor import FeatureExtractor
@@ -51,6 +56,10 @@ logger.addHandler(stream_handler)
 mne.set_log_level(verbose='WARNING')
 
 channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
+
+
+
+
 # channels = ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
             # "CP3",
             # "CP1",
@@ -117,38 +126,40 @@ train = [
 	"../data/S010/S010R07.edf",
 	"../data/S010/S010R11.edf",
 	"../data/S011/S011R03.edf",
-	# "../data/S011/S011R07.edf",
-	# "../data/S011/S011R11.edf",
-	# "../data/S012/S012R03.edf",
-	# "../data/S012/S012R07.edf",
-	# "../data/S012/S012R11.edf",
-	# "../data/S013/S013R03.edf",
-	# "../data/S013/S013R07.edf",
-	# "../data/S013/S013R11.edf",
-	# "../data/S014/S014R03.edf",
-	# "../data/S014/S014R07.edf",
-	# "../data/S014/S014R11.edf",
-	# "../data/S015/S015R03.edf",
-	# "../data/S015/S015R07.edf",
-	# "../data/S015/S015R11.edf",
-	# "../data/S016/S016R03.edf",
-	# "../data/S016/S016R07.edf",
-	# "../data/S016/S016R11.edf",
-	# "../data/S017/S017R03.edf",
-	# "../data/S017/S017R07.edf",
-	# "../data/S017/S017R11.edf",
-	# "../data/S018/S018R03.edf",
-	# "../data/S018/S018R07.edf",
-	# "../data/S018/S018R11.edf",
-	# "../data/S019/S019R03.edf",
-	# "../data/S019/S019R07.edf",
-	# "../data/S019/S019R11.edf",
-	# "../data/S020/S020R03.edf",
-	# "../data/S020/S020R07.edf",
-	# "../data/S020/S020R11.edf",
-	# "../data/S021/S021R03.edf",
-	# "../data/S021/S021R07.edf",
-	# "../data/S021/S021R11.edf",
+	"../data/S011/S011R07.edf",
+	"../data/S011/S011R11.edf",
+	"../data/S012/S012R03.edf",
+	"../data/S012/S012R07.edf",
+	"../data/S012/S012R11.edf",
+	"../data/S013/S013R03.edf",
+	"../data/S013/S013R07.edf",
+	"../data/S013/S013R11.edf",
+	"../data/S014/S014R03.edf",
+	"../data/S014/S014R07.edf",
+	"../data/S014/S014R11.edf",
+	"../data/S015/S015R03.edf",
+	"../data/S015/S015R07.edf",
+	"../data/S015/S015R11.edf",
+	"../data/S016/S016R03.edf",
+	"../data/S016/S016R07.edf",
+	"../data/S016/S016R11.edf",
+	"../data/S017/S017R03.edf",
+	"../data/S017/S017R07.edf",
+	"../data/S017/S017R11.edf",
+	"../data/S018/S018R03.edf",
+	"../data/S018/S018R07.edf",
+	"../data/S018/S018R11.edf",
+	"../data/S019/S019R03.edf",
+	"../data/S019/S019R07.edf",
+	"../data/S019/S019R11.edf",
+	"../data/S020/S020R03.edf",
+	"../data/S020/S020R07.edf",
+	"../data/S020/S020R11.edf",
+	"../data/S021/S021R03.edf",
+	"../data/S021/S021R07.edf",
+	"../data/S021/S021R11.edf",
+
+
 	# "../data/S022/S022R03.edf",
 	# "../data/S022/S022R07.edf",
 	# "../data/S022/S022R11.edf",
@@ -270,37 +281,37 @@ train = [
 	"../data/S010/S010R08.edf",
 	"../data/S010/S010R12.edf",
 	"../data/S011/S011R04.edf",
+	"../data/S011/S011R08.edf",
+	"../data/S011/S011R12.edf",
+	"../data/S012/S012R04.edf",
+	"../data/S012/S012R08.edf",
+	"../data/S012/S012R12.edf",
+	"../data/S013/S013R04.edf",
+	"../data/S013/S013R08.edf",
+	"../data/S013/S013R12.edf",
+	"../data/S014/S014R04.edf",
+	"../data/S014/S014R08.edf",
+	"../data/S014/S014R12.edf",
+	"../data/S015/S015R04.edf",
+	"../data/S015/S015R08.edf",
+	"../data/S015/S015R12.edf",
+	"../data/S016/S016R04.edf",
+	"../data/S016/S016R08.edf",
+	"../data/S016/S016R12.edf",
+	"../data/S017/S017R04.edf",
+	"../data/S017/S017R08.edf",
+	"../data/S017/S017R12.edf",
+	"../data/S018/S018R04.edf",
+	"../data/S018/S018R08.edf",
+	"../data/S018/S018R12.edf",
+	"../data/S019/S019R04.edf",
+	"../data/S019/S019R08.edf",
+	"../data/S019/S019R12.edf",
+	"../data/S020/S020R04.edf",
+	"../data/S020/S020R08.edf",
+	"../data/S020/S020R12.edf",
 
 
-	# "../data/S011/S011R08.edf",
-	# "../data/S011/S011R12.edf",
-	# "../data/S012/S012R04.edf",
-	# "../data/S012/S012R08.edf",
-	# "../data/S012/S012R12.edf",
-	# "../data/S013/S013R04.edf",
-	# "../data/S013/S013R08.edf",
-	# "../data/S013/S013R12.edf",
-	# "../data/S014/S014R04.edf",
-	# "../data/S014/S014R08.edf",
-	# "../data/S014/S014R12.edf",
-	# "../data/S015/S015R04.edf",
-	# "../data/S015/S015R08.edf",
-	# "../data/S015/S015R12.edf",
-	# "../data/S016/S016R04.edf",
-	# "../data/S016/S016R08.edf",
-	# "../data/S016/S016R12.edf",
-	# "../data/S017/S017R04.edf",
-	# "../data/S017/S017R08.edf",
-	# "../data/S017/S017R12.edf",
-	# "../data/S018/S018R04.edf",
-	# "../data/S018/S018R08.edf",
-	# "../data/S018/S018R12.edf",
-	# "../data/S019/S019R04.edf",
-	# "../data/S019/S019R08.edf",
-	# "../data/S019/S019R12.edf",
-	# "../data/S020/S020R04.edf",
-	# "../data/S020/S020R08.edf",
-	# "../data/S020/S020R12.edf",
 	# "../data/S021/S021R04.edf",
 	# "../data/S021/S021R08.edf",
 	# "../data/S021/S021R12.edf",
@@ -425,8 +436,6 @@ train = [
 	"../data/S010/S010R09.edf",
 	"../data/S010/S010R13.edf",
 	"../data/S011/S011R05.edf",
-
-
 	"../data/S011/S011R09.edf",
 	"../data/S011/S011R13.edf",
 	"../data/S012/S012R05.edf",
@@ -435,30 +444,33 @@ train = [
 	"../data/S013/S013R05.edf",
 	"../data/S013/S013R09.edf",
 	"../data/S013/S013R13.edf",
-	# "../data/S014/S014R05.edf",
-	# "../data/S014/S014R09.edf",
-	# "../data/S014/S014R13.edf",
-	# "../data/S015/S015R05.edf",
-	# "../data/S015/S015R09.edf",
-	# "../data/S015/S015R13.edf",
-	# "../data/S016/S016R05.edf",
-	# "../data/S016/S016R09.edf",
-	# "../data/S016/S016R13.edf",
-	# "../data/S017/S017R05.edf",
-	# "../data/S017/S017R09.edf",
-	# "../data/S017/S017R13.edf",
-	# "../data/S018/S018R05.edf",
-	# "../data/S018/S018R09.edf",
-	# "../data/S018/S018R13.edf",
-	# "../data/S019/S019R05.edf",
-	# "../data/S019/S019R09.edf",
-	# "../data/S019/S019R13.edf",
-	# "../data/S020/S020R05.edf",
-	# "../data/S020/S020R09.edf",
-	# "../data/S020/S020R13.edf",
-	# "../data/S021/S021R05.edf",
-	# "../data/S021/S021R09.edf",
-	# "../data/S021/S021R13.edf",
+	"../data/S014/S014R05.edf",
+	"../data/S014/S014R09.edf",
+	"../data/S014/S014R13.edf",
+	"../data/S015/S015R05.edf",
+	"../data/S015/S015R09.edf",
+	"../data/S015/S015R13.edf",
+	"../data/S016/S016R05.edf",
+	"../data/S016/S016R09.edf",
+	"../data/S016/S016R13.edf",
+	"../data/S017/S017R05.edf",
+	"../data/S017/S017R09.edf",
+	"../data/S017/S017R13.edf",
+	"../data/S018/S018R05.edf",
+	"../data/S018/S018R09.edf",
+	"../data/S018/S018R13.edf",
+	"../data/S019/S019R05.edf",
+	"../data/S019/S019R09.edf",
+	"../data/S019/S019R13.edf",
+	"../data/S020/S020R05.edf",
+	"../data/S020/S020R09.edf",
+	"../data/S020/S020R13.edf",
+	"../data/S021/S021R05.edf",
+	"../data/S021/S021R09.edf",
+	"../data/S021/S021R13.edf",
+
+
+
 	# "../data/S022/S022R05.edf",
 	# "../data/S022/S022R09.edf",
 	# "../data/S022/S022R13.edf",
@@ -635,21 +647,26 @@ train = [
 	"../data/S021/S021R06.edf",
 	"../data/S021/S021R10.edf",
 	"../data/S021/S021R14.edf",
-	"../data/S022/S022R06.edf",
-	"../data/S022/S022R10.edf",
-	"../data/S022/S022R14.edf",
-	"../data/S023/S023R06.edf",
-	"../data/S023/S023R10.edf",
-	"../data/S023/S023R14.edf",
-	"../data/S024/S024R06.edf",
-	"../data/S024/S024R10.edf",
-	"../data/S024/S024R14.edf",
-	"../data/S025/S025R06.edf",
-	"../data/S025/S025R10.edf",
-	"../data/S025/S025R14.edf",
-	"../data/S026/S026R06.edf",
-	"../data/S026/S026R10.edf",
-	"../data/S026/S026R14.edf",
+
+	# "../data/S022/S022R06.edf",
+	# "../data/S022/S022R10.edf",
+	# "../data/S022/S022R14.edf",
+	# "../data/S023/S023R06.edf",
+	# "../data/S023/S023R10.edf",
+	# "../data/S023/S023R14.edf",
+	# "../data/S024/S024R06.edf",
+	# "../data/S024/S024R10.edf",
+	# "../data/S024/S024R14.edf",
+	# "../data/S025/S025R06.edf",
+	# "../data/S025/S025R10.edf",
+	# "../data/S025/S025R14.edf",
+	# "../data/S026/S026R06.edf",
+	# "../data/S026/S026R10.edf",
+	# "../data/S026/S026R14.edf",
+
+
+
+
 	# "../data/S027/S027R06.edf",
 	# "../data/S027/S027R10.edf",
 	# "../data/S027/S027R14.edf",
@@ -1168,7 +1185,8 @@ def main():
 										max_iter=16000,
 										random_state=42
 			)
-		
+
+
 			pipeline = Pipeline([
 				('scaler', custom_scaler),
 				('reshaper', reshaper),
@@ -1195,13 +1213,13 @@ def main():
 				#MLP
 				{
 					'classifier': [MLPClassifier(
-						max_iter=16000,
+						max_iter=10000,
 						early_stopping=True,
-						n_iter_no_change=100, #if it doesnt improve for 10 epochs
+						n_iter_no_change=50, #if it doesnt improve for 10 epochs
 						verbose=False)],
-					'pca__n_comps': [20,30,42,50],
+					'pca__n_comps': [20,42,50],
 					#hidden layers of multilayer perceptron class
-					'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 50)],
+					'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 30)],
 					#relu->helps mitigate vanishing gradients, faster convergence
 					#tanh->hyperbolic tangent, outputs centered around zero
 					'classifier__activation': ['relu', 'tanh'],
@@ -1214,7 +1232,7 @@ def main():
 				#SVC
 				{
 					'classifier': [SVC()],
-					'pca__n_comps': [20, 30, 42, 50],
+					'pca__n_comps': [20, 42, 50],
 					'classifier__C': [0.1, 1, 10],
 					'classifier__kernel': ['linear', 'rbf']
 				},
@@ -1222,13 +1240,13 @@ def main():
 				# RANDOM FOREST
 				{
 					'classifier': [RandomForestClassifier()],
-					'pca__n_comps': [20,30,42,50],
+					'pca__n_comps': [20, 42],
 					'classifier__n_estimators': [50, 100, 200],
 					'classifier__max_depth': [None, 10, 20]
 				},
 				#DECISION TREE
 				{
-					'pca__n_comps': [20, 30, 42, 50],
+					'pca__n_comps': [20, 42],
 					'classifier': [DecisionTreeClassifier()],
 					'classifier__max_depth': [None, 10, 20],
 					'classifier__min_samples_split': [2, 5, 10]
@@ -1236,7 +1254,7 @@ def main():
 				# Logistic Regression
 				{
 					'classifier': [LogisticRegression()],
-					'pca__n_comps': [20, 30, 42, 50],
+					'pca__n_comps': [20, 42, 50],
 					'classifier__C': [0.1, 1, 10],
 					'classifier__penalty': ['l1', 'l2'],
 					'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
@@ -1259,21 +1277,43 @@ def main():
 			#just to use standard variables
 			X_train = trained_extracted_features
 			y_train = trained_extracted_labels
-			grid_search.fit(X_train, y_train)
 
-			print("Best Parameters:")
-			print(grid_search.best_params_)
-			print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.2f}")
+			mlflow.set_tracking_uri("http://localhost:5000")  #uri
+			print(mlflow.get_tracking_uri())  #should have a uri output, do i have to start mlflow before?
 
-
-			best_pipeline = grid_search.best_estimator_
-			model_filename = f"../models/pipe_{group_key}.joblib"
-
-			joblib.dump(best_pipeline, model_filename)
+			with mlflow.start_run(run_name=group_key):
+				grid_search.fit(X_train, y_train)
 
 
+				best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
+				best_score = float(grid_search.best_score_)  # Ensure it's a Python float
+				
+				mlflow.set_experiment(f"{group_key}")
+				mlflow.log_param('group_key', group_key)
+				mlflow.log_params(best_params)
+				mlflow.log_metric('best_cross_val_accuracy', best_score)
 
 
+				print("Best Parameters:")
+				print(best_params)
+				print(f"Best Cross-Validation Accuracy: {best_score:.2f}")
+
+
+				signature = infer_signature(X_train, y_train)
+				best_pipeline = grid_search.best_estimator_
+				model_filename = f"../models/pipe_{group_key}.joblib"
+				joblib.dump(best_pipeline, model_filename)
+
+				mlflow.sklearn.log_model(
+					sk_model=best_pipeline, 
+					artifact_path='models', 
+					signature=signature, 
+					registered_model_name=f"model_{group_key}"
+					)
+
+
+
+		# time.sleep()
 
 
 

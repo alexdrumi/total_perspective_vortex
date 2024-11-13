@@ -8,6 +8,8 @@ class My_PCA(BaseEstimator, TransformerMixin):
 		self.basis = None
 		self.current_centered_feature = None
 
+
+
 	def fit(self, x_features: np.ndarray, y=None) -> "My_PCA":
 		self.mean_ = np.mean(x_features, axis=0)
 	
@@ -43,6 +45,7 @@ class My_PCA(BaseEstimator, TransformerMixin):
 		Vt = eigvecs.T
 		self.basis = np.asarray(Vt[:self.n_comps, :])
 		return self
+
 
 
 	def transform(self, x_features: np.ndarray) -> np.ndarray:
