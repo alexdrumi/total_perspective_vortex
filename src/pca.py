@@ -12,18 +12,20 @@ class My_PCA(BaseEstimator, TransformerMixin):
 
 	def fit(self, x_features: np.ndarray, y=None) -> "My_PCA":
 		self.mean_ = np.mean(x_features, axis=0)
-	
-		self.mean_ = np.reshape(np.asarray(self.mean_), (-1,))
+		self.mean_ = np.reshape(np.asarray(self.mean_), (-1,)) #consistent for 1d operations
 
 		n_samples=x_features.shape[0]
-		C = x_features.T @ x_features
-		C -= (
+
+		#captures how much each feature varies from the mean with respect to every other feature
+		C = x_features.T @ x_features #dot product of the transposed data with itself
+		C -= ( #subtract outer product of the mean vector scaled by the nr of samples to center the data
 			n_samples
 			* np.reshape(self.mean_, (-1, 1))
 			* np.reshape(self.mean_, (1, -1))
 		)
-		C /= n_samples - 1
+		C /= n_samples - 1 #sample mean
 
+		#center the data
 		x_features = x_features.T
 		zerodx = x_features
 
@@ -34,6 +36,7 @@ class My_PCA(BaseEstimator, TransformerMixin):
 		cov_matrix = np.cov(zerodx)
 		cov_matrix = C
 
+		#eigen decomposition -> find eigenvals, and their associated vectors
 		eigvals, eigvecs = np.linalg.eigh(cov_matrix)
 		eigvals = np.reshape(np.asarray(eigvals), (-1,))
 		eigvecs = np.asarray(eigvecs)

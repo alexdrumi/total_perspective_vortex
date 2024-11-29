@@ -51,9 +51,9 @@ channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 predict = [
 
 	#3,7,11
-	"../data/S030/S030R03.edf",
-	"../data/S030/S030R07.edf",
-	"../data/S030/S030R11.edf",
+	"../data/S030/S030R03.edf", #run type 1
+	"../data/S030/S030R07.edf", #run type 2
+	"../data/S030/S030R11.edf", #run type 3
 	"../data/S031/S031R03.edf",
 	"../data/S031/S031R07.edf",
 	"../data/S031/S031R11.edf",
@@ -62,9 +62,9 @@ predict = [
 	"../data/S032/S032R11.edf",
 
 	#4,8,12
-	"../data/S031/S031R08.edf",
-	"../data/S031/S031R12.edf",
-	"../data/S032/S032R04.edf",
+	"../data/S031/S031R08.edf", #run type 4
+	"../data/S031/S031R12.edf", #run type 5
+	"../data/S032/S032R04.edf", #run type 6
 	"../data/S032/S032R08.edf",
 	"../data/S032/S032R12.edf",
 	"../data/S033/S033R04.edf",
