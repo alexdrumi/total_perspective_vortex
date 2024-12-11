@@ -15,7 +15,9 @@ TODO:
 
 class Preprocessor:
 	def __init__(self):
-		self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
+		self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
+		# self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
+
 		self.raw_data = []
 		self.experiments_list = [
 			{
@@ -106,6 +108,7 @@ class Preprocessor:
 
 		for key, raw_list in concatted_raw_data_dict.items():
 			if raw_list:
+				print(f'{concatted_raw_data_dict[key]} is current raw data dict with key {key}')
 				concatted_raw_data_dict[key] = mne.concatenate_raws(raw_list)
 			else:
 				concatted_raw_data_dict[key] = None

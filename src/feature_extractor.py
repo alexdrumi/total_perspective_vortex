@@ -42,7 +42,7 @@ class FeatureExtractor():
 		Output: a (x,y,z)d np array of created features based on mean, energy, power
 		NO LABELS HERE, WILL DO SEPARATE
 		'''
-		sfreq = 160.0
+		sfreq = 160.0 #this keeps some of them out from the training but otherwise we would have to alter the structure of the pipeline, for now this is ok
 		all_features = []
 
 		analysis = {

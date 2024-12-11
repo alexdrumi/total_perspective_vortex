@@ -32,8 +32,10 @@ class EpochExtractor:
 
 
 	def extract_epochs(self, data: mne.io.Raw) -> Tuple[mne.epochs.Epochs, float]:
-		event_id = {"T1": 1, "T2": 2}
+		# event_id = {"T1": 1, "T2": 2} #here include T0
+		event_id = {"T0": 1, "T1": 2, "T2": 3} #here include T0
 		events, _ = mne.events_from_annotations(data)
+		# print(f'{_} are event ids')
 		sfreq = data.info["sfreq"]
 		epochs = mne.Epochs(data, events, event_id=event_id, tmin=-2, tmax=5.1,
 							baseline=None, preload=True)
@@ -56,6 +58,7 @@ class EpochExtractor:
 					epochs_for_multiple_files[key] = current_epochs 
 
 					current_labels = current_epochs.events[:, 2] -1
+					print(f"current labels are {current_labels}")
 					labels_for_multiple_files[key] = current_labels
 
 			return epochs_for_multiple_files, labels_for_multiple_files
