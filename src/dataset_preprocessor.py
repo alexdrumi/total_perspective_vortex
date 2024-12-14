@@ -40,6 +40,16 @@ class Preprocessor:
 				"mapping": {0: "rest", 7: "both fists imagined", 8: "both feet imagined"},
 				"event_id": {"imagine both fists": 2, "imagine both feet": 3},
 			},
+			{
+				"runs": [1],
+				"mapping": {0: "rest", 1: "open", 2: "closed"},
+				"event_id": {"open eyes": 2, "closed eyes": 3},
+			},
+			{
+				"runs": [2],
+				"mapping": {0: "rest", 1: "closed", 2: "open"},
+				"event_id": {"closed eyes": 2, "open eyes": 3},
+			},
 		]
 
 
@@ -55,6 +65,8 @@ class Preprocessor:
 	def load_raw_data(self, data_path: List[str]):
 		loaded_raw_data = []
 		concatted_raw_data_dict = {
+			'1': [],
+			'2': [],
 			'3': [],
 			'4': [],
 			'5': [],
@@ -83,7 +95,11 @@ class Preprocessor:
 					continue
 
 				raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
-			
+
+				if run_nr == 1:
+					concatted_raw_data_dict['1'].append(raw)
+				if run_nr == 2:
+					concatted_raw_data_dict['2'].append(raw)
 				if run_nr in [3, 7, 11]:
 					concatted_raw_data_dict['3'].append(raw)
 				elif run_nr in [4, 8, 12]:
@@ -131,8 +147,8 @@ class Preprocessor:
 		for key, raw in loaded_raw_data.items():
 			if raw is not None:  #ensure there is data to filter
 				raw.load_data()  #load for filtering
-				current_filtered = self.filter_frequencies(raw, lo_cut=0.1, hi_cut=30, noise_cut=50)
-				filtered_data_dict[key] = current_filtered
+				# current_filtered = self.filter_frequencies(raw, lo_cut=0.1, hi_cut=30, noise_cut=50)
+				filtered_data_dict[key] = raw
 			else:
 				print(f'KEY {key} IS EMPTY')
 				filtered_data_dict[key] = None #handle empty keys if needed

@@ -36,7 +36,7 @@ class FeatureExtractor():
 
 
 
-	def extract_features(self, extracted_epochs_dict):
+	def extract_features(self, extracted_epochs_dict, run_type):
 		'''
 		Input: filtered and cropped list of epochs from EpochExtractor
 		Output: a (x,y,z)d np array of created features based on mean, energy, power
@@ -45,6 +45,8 @@ class FeatureExtractor():
 		sfreq = 160.0 #this keeps some of them out from the training but otherwise we would have to alter the structure of the pipeline, for now this is ok
 		all_features = []
 
+
+
 		analysis = {
 			'mrcp': {'tmin': -2, 'tmax': 0, 'lofreq': 3, 'hifreq': 30},
 			'erd': {'tmin': -2, 'tmax': 0, 'lofreq': 8, 'hifreq': 30},
@@ -52,6 +54,12 @@ class FeatureExtractor():
 		}
 
 		
+		if run_type == 'baseline':  #if run 1 or 2
+			for key in analysis:
+				analysis[key]['tmin'] = 0
+				analysis[key]['tmax'] = 0.793
+
+
 		feature_matrices = []
 		for analysis_name, params in analysis.items():
 			cropped_epochs = extracted_epochs_dict.copy().crop(tmin=params['tmin'], tmax=params['tmax'])
