@@ -50,7 +50,50 @@ logger.addHandler(stream_handler)
 channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 predict = [
 
+
+
+
+
+# run 1, eyes open
+	"../data/S011/S011R01.edf",
+	"../data/S012/S012R01.edf",
+	"../data/S023/S023R01.edf",
+	"../data/S024/S024R01.edf",
+	"../data/S025/S025R01.edf",
+	"../data/S026/S026R01.edf",
+	"../data/S027/S027R01.edf",
+	"../data/S028/S028R01.edf",
+	"../data/S029/S029R01.edf",
+	"../data/S030/S030R01.edf",
+	"../data/S031/S031R01.edf",
+	"../data/S032/S032R01.edf",
+	"../data/S033/S033R01.edf",
+	"../data/S034/S034R01.edf",
+
+
+#run 2, eyes closed
+	"../data/S011/S011R02.edf",
+	"../data/S012/S012R02.edf",
+	"../data/S023/S023R02.edf",
+	"../data/S024/S024R02.edf",
+	"../data/S025/S025R02.edf",
+	"../data/S026/S026R02.edf",
+	"../data/S027/S027R02.edf",
+	"../data/S028/S028R02.edf",
+	"../data/S029/S029R02.edf",
+	"../data/S030/S030R02.edf",
+	"../data/S031/S031R02.edf",
+	"../data/S032/S032R02.edf",
+	"../data/S033/S033R02.edf",
+	"../data/S034/S034R02.edf",
+
+
+
 	#3,7,11
+	#3-Task 1 (open and close left or right fist) #run 3-T1:left, T2:right real
+	#4-Task 2 (imagine opening and closing left or right fist) run 3-T1:left, T2:right imagined
+	#5-Task 3 (open and close both fists or both feet) run 5-9-13-T1:both fists T2:both feet real
+	#6-Task 4 (imagine opening and closing both fists or both feet) run 6-10-14-T1:both fists imagined T2:both feet imagined
 	# "../data/S030/S030R03.edf", #run type 1
 	# "../data/S030/S030R07.edf", #run type 2
 	# "../data/S030/S030R11.edf", #run type 3
@@ -62,14 +105,14 @@ predict = [
 	# "../data/S032/S032R11.edf",
 
 	#4,8,12
-	# "../data/S031/S031R08.edf", #run type 4
-	# "../data/S031/S031R12.edf", #run type 5
-	# "../data/S032/S032R04.edf", #run type 6
-	# "../data/S032/S032R08.edf",
-	# "../data/S032/S032R12.edf",
-	# "../data/S033/S033R04.edf",
-	# "../data/S033/S033R08.edf",
-	# "../data/S033/S033R12.edf",
+	"../data/S031/S031R08.edf", #run type 4
+	"../data/S031/S031R12.edf", #run type 5
+	"../data/S032/S032R04.edf", #run type 6
+	"../data/S032/S032R08.edf",
+	"../data/S032/S032R12.edf",
+	"../data/S033/S033R04.edf",
+	"../data/S033/S033R08.edf",
+	"../data/S033/S033R12.edf",
 
 
 	"../data/S056/S056R08.edf",
@@ -150,14 +193,14 @@ predict = [
 
 
 	#5,9,13
-	# "../data/S031/S031R09.edf",
-	# "../data/S031/S031R13.edf",
-	# "../data/S032/S032R05.edf",
-	# "../data/S032/S032R09.edf",
-	# "../data/S032/S032R13.edf",
-	# "../data/S033/S033R05.edf",
-	# "../data/S033/S033R09.edf",
-	# "../data/S033/S033R13.edf",
+	"../data/S031/S031R09.edf",
+	"../data/S031/S031R13.edf",
+	"../data/S032/S032R05.edf",
+	"../data/S032/S032R09.edf",
+	"../data/S032/S032R13.edf",
+	"../data/S033/S033R05.edf",
+	"../data/S033/S033R09.edf",
+	"../data/S033/S033R13.edf",
 
 
 	"../data/S056/S056R09.edf",
@@ -345,16 +388,18 @@ def main():
 		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict)
 		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data)
 
+
+		
 		epoch_extractor_instance = EpochExtractor()
 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 		run_groups = epoch_extractor_instance.experiments_list
 
 		i = 0
 		for group in run_groups:
-			group_runs = group['runs']
-			group_key = f"runs_{'_'.join(map(str, group_runs))}"
+			groups_runs = group['runs']
+			group_key = f"runs_{'_'.join(map(str, groups_runs))}"
 			models_to_load = f"../models/pipe_{group_key}.joblib"
-			run_keys = list(set([run_key for run_key in epochs_predict.keys() if int(run_key[-2:]) in group_runs]))
+			run_keys = list(set([run_key for run_key in epochs_predict.keys() if int(run_key[-2:]) in groups_runs]))
 			time.sleep(5)
 			available_runs = list[set([run_key for run_key in run_keys if run_key in epochs_predict])]
 
@@ -369,16 +414,19 @@ def main():
 				print(f'Pipeline file not found at {model_location}. Continuing to search another.')
 				pipeline = None
 				continue
-
+			
+			feature_extraction_method = 'events'
+			if (groups_runs[0] == 1 or groups_runs[0] == 2):
+				feature_extraction_method = 'baseline'
 
 			feature_extractor_instance = FeatureExtractor()
-			test_extracted_features = feature_extractor_instance.extract_features(epochs_predict[run_keys[0]]) 
+			test_extracted_features = feature_extractor_instance.extract_features(epochs_predict[run_keys[0]], feature_extraction_method) 
 
 			i = 0 
 			flattened_epochs = epochs_predict[run_keys[0]]
 			flattened_labels = labels_predict[run_keys[0]]
 
-			chunk_size = 15
+			chunk_size = 7
 			true_predictions_per_chunks = []
 			total_chunks = len(flattened_epochs) // chunk_size
 			true_predictions_per_chunks = []
@@ -420,7 +468,7 @@ def main():
 				# 	alpha=0.3,
 				# 	linewidth=0.7
 				# )
-				time.sleep(3)
+				# time.sleep(5)
 
 
 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
@@ -444,7 +492,7 @@ def main():
 			)
 
 			print(scores)
-			print(f"\033[92mAverage accuracy with cross-validation for group: {group_runs}: {scores.mean():.2f}\033[0m")
+			print(f"\033[92mAverage accuracy with cross-validation for group: {groups_runs}: {scores.mean():.2f}\033[0m")
 
 		# time.sleep()
 	except FileNotFoundError as e:

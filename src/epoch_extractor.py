@@ -5,12 +5,12 @@ from typing import List, Tuple
 #we dont need the baseestimator and transformermixin here actually
 class EpochExtractor:
 	def __init__(self):
+		#3,7,11
+		#3-Task 1 (open and close left or right fist) #run 3-7-11-T1:left real, T2:right real
+		#4-Task 2 (imagine opening and closing left or right fist) run 4-8-12-T1:left imagined, T2:right imagined
+		#5-Task 3 (open and close both fists or both feet) run 5-9-13-T1:both fists T2:both feet real
+		#6-Task 4 (imagine opening and closing both fists or both feet) run 6-10-14-T1:both fists imagined T2:both feet imagined
 		self.experiments_list = [
-			# {
-			# 	"runs": [3,7,11],
-			# 	"mapping": {0: "rest", 1: "left fist", 2: "right fist"},
-			# 	"event_id": {"left fist": 2, "right fist": 3},
-			# },
 			{
 				"runs": [1],
 				"mapping": {0: "rest", 1: "open", 2: "closed"},
@@ -22,6 +22,12 @@ class EpochExtractor:
 				"event_id": {"closed eyes": 2, "open eyes": 3},
 			},
 			{
+				"runs": [3,7,11],
+				"mapping": {0: "rest", 1: "left fist", 2: "right fist"},
+				"event_id": {"left fist": 2, "right fist": 3},
+			},
+			
+			{
 				"runs": [4,8,12],
 				"mapping": {0: "rest", 1: "left imagined", 2: "right imagined"},
 				"event_id": {"left fist imagined": 2, "right fist imagined": 3},
@@ -31,11 +37,11 @@ class EpochExtractor:
 				"mapping": {0: "rest", 1: "both fists", 2: "both feet"},
 				"event_id": {"both fists": 2, "both feet": 3},
 			},
-			# {
-			# 	"runs": [6, 10, 14],
-			# 	"mapping": {0: "rest", 1: "both fists imagined", 2: "both feet imagined"},
-			# 	"event_id": {"imagine both fists": 8, "imagine both feet": 9},
-			# },
+			{
+				"runs": [6, 10, 14],
+				"mapping": {0: "rest", 1: "both fists imagined", 2: "both feet imagined"},
+				"event_id": {"imagine both fists": 2, "imagine both feet": 3},
+			},
 		]
 
 
