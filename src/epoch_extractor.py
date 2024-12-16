@@ -2,10 +2,8 @@ import mne
 import numpy as np
 from typing import List, Tuple
 
-#we dont need the baseestimator and transformermixin here actually
 class EpochExtractor:
 	def __init__(self):
-		#3,7,11
 		#3-Task 1 (open and close left or right fist) #run 3-7-11-T1:left real, T2:right real
 		#4-Task 2 (imagine opening and closing left or right fist) run 4-8-12-T1:left imagined, T2:right imagined
 		#5-Task 3 (open and close both fists or both feet) run 5-9-13-T1:both fists T2:both feet real
@@ -49,7 +47,6 @@ class EpochExtractor:
 	def extract_epochs(self, data: mne.io.Raw) -> Tuple[mne.epochs.Epochs, float]:
 		# event_id = {"T0": 1, "T1": 2, "T2": 3} #here include T0
 		# event_id = {"T1": 1, "T2": 2} #this is fine in general
-
 		#only t0 = 1 in the baseline eye open
 		events, event_id = mne.events_from_annotations(data)
 		print(f'{event_id} are event ids')
@@ -58,6 +55,7 @@ class EpochExtractor:
 		# print(event_times)
 		# tmin, tmax = 0
 
+		#WE COULD MAKE THIS PRETTIER with a dict or so!!!!!!!!
 		if (len(event_id) == 1): #single event, baseline open or closed eyes
 			t_min = 0
 			t_max = 0.793
