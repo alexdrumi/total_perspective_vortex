@@ -578,15 +578,28 @@ def display_epoch_stats(start, chunk_size, current_pred, current_labels):
 
 def main():
 	try:
+		argument_config = [
+			{
+				'name'='--plot_eeg_predictions',
+				'type'=str,
+				'default'= 'false'
+				'choices'=['true', 'false'],
+				'help'='Enable (True) or disable (False) the visual representation of the EEG data with it\s associated prediction.\n'
+			}
+		]
+		arg_parser = CommandLineParser(argument_config)
+		plot_eeg_predictions_enabled = arg_parser.parse_arguments()
+		
+		#preprocess data
 		dataset_preprocessor_instance = Preprocessor()
 		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict)
 		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data)
 
-
-		
+		#extract epochs (events) and labels from data
 		epoch_extractor_instance = EpochExtractor()
 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 		run_groups = epoch_extractor_instance.experiments_list
+
 
 		i = 0
 		for group in run_groups:
@@ -652,18 +665,18 @@ def main():
 				print(f'Current accuracy after processing epoch {start}-{end}: {current_batch_accuracy}.\nPrediction of this batch took: {total_time_for_current_batch} seconds of time.')
 
 				label_names = group['mapping']
-				# plot_eeg_epochs_chunk(
-				# 	current_batch_idx=chunk_idx,
-				# 	epochs_chunk=epochs_data,
-				# 	labels_chunk=current_labels,
-				# 	predictions_chunk=current_pred,
-				# 	label_names=label_names,
-				# 	ax=ax,
-				# 	alpha=0.3,
-				# 	linewidth=0.7
-				# )
-				# time.sleep(5)
-
+				if plot_eeg_predictions_enabled == True:
+					plot_eeg_epochs_chunk(
+						current_batch_idx=chunk_idx,
+						epochs_chunk=epochs_data,
+						labels_chunk=current_labels,
+						predictions_chunk=current_pred,
+						label_names=label_names,
+						ax=ax,
+						alpha=0.3,
+						linewidth=0.7
+					)
+					time.sleep(2)
 
 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
 			print(f'{total_accuracy_on_this_test_set} is the total accuracy on this test set. Now we test with cross validation.')

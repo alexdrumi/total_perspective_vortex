@@ -33,6 +33,9 @@ from epoch_extractor import EpochExtractor
 from custom_scaler import CustomScaler
 from reshaper import Reshaper
 
+from command_line_parser import CommandLineParser
+import subprocess
+
 #logger config
 #logging for both file and console
 logger = logging.getLogger()
@@ -1463,15 +1466,42 @@ train = [
 
 # ica = mne.preprocessing.ICA(method="infomax")
 #--------------------------------------------------------------------------------------------------------------------------
+
+
+def initate_mlflow_environment():
+	subprocess.Popen(["mlflow", "ui"])
+	mlflow.set_tracking_uri("http://localhost:5000")  #uri
+	print('mlfow is running on http://localhost:5000", here you can follow the model metrics.')
+	time.sleep(2)
+
+
 def main():
 	try:
+		argument_config = [
+			{
+				'name': '--mlfow',
+				'type': str,
+				'default': 'false',
+				'choices': ['true', 'false'],
+				'help':'Enable (True) or disable (False) the mlflow server for tracking model analysis. Default is False.\n'
+			}
+		]
+		arg_parser = CommandLineParser(argument_config)
+		mlflow_enabled = arg_parser.parse_arguments()
+		print(f'{mlflow_enabled} is the command line argument')
+		if (mlflow_enabled == True):
+			initate_mlflow_environment()
+
+		#data processing
 		dataset_preprocessor_instance = Preprocessor()
 		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=train) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
 		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #this returns a triplet now
 	
+		#epoch (events) and label extraction
 		epoch_extractor_instance = EpochExtractor()
 		epochs_dict, labels_dict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 		
+		#process run groups (14 test runs separated to different run groups based on motion onse)
 		run_groups = epoch_extractor_instance.experiments_list
 		for groups in run_groups:
 			groups_runs = groups['runs']
@@ -1485,15 +1515,13 @@ def main():
 				print(f"No available runs for group '{group_key}', skipping.")
 				continue
 			
-			feature_extraction_method = 'events'
-			if groups_runs[0] == 1 or groups_runs[0] == 2:
-				feature_extraction_method = 'baseline'
-
-
+			feature_extraction_method = 'baseline' if groups_runs[0] in [1,2] else 'events'
+			
+			#feature extraction
 			feature_extractor_instance = FeatureExtractor()
-			trained_extracted_features = feature_extractor_instance.extract_features(epochs_dict[run_keys[0]], feature_extraction_method) #for now groups runs[0] is ok but at 13 etc it wont be
-			trained_extracted_labels = labels_dict[run_keys[0]]
-
+			X_train = feature_extractor_instance.extract_features(epochs_dict[run_keys[0]], feature_extraction_method) #trained_extracted_features, for now groups runs[0] is ok but at 13 etc it wont be
+			y_train = labels_dict[run_keys[0]] #trained_extracted_labels
+			
 
 			#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
 			custom_scaler = CustomScaler()
@@ -1511,21 +1539,7 @@ def main():
 				('pca', my_pca),
 				('classifier', mlp_classifier) #mlp will be replaced in grid search
 			])
-			# pipeline.fit(trained_extracted_features, trained_extracted_labels)
-			# shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
-			# # # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
-			# # # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_)
-			# scores = cross_val_score(
-			# 	pipeline, trained_extracted_features, 
-			# 	trained_extracted_labels,  
-			# 	scoring='accuracy', 
-			# 	cv=shuffle_split_validation
-			# )
-			
-			# print(scores)
-			# print(f'Average accuracy: {scores.mean()}')
-
-
+		
 
 			grid_search_params = [
 				#MLP
@@ -1577,7 +1591,6 @@ def main():
 					'classifier__C': [0.1, 1, 10],
 					'classifier__penalty': ['l1', 'l2'],
 					'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
-					'classifier__multi_class': ['auto'], #will use multinomial instead of multi_class
 					'classifier__max_iter': [1000, 5000]
 				}
 			]
@@ -1594,41 +1607,68 @@ def main():
 			)
 
 			#just to use standard variables
-			X_train = trained_extracted_features
-			y_train = trained_extracted_labels
+			# X_train = trained_extracted_features
+			# y_train = trained_extracted_labels
 
-			mlflow.set_tracking_uri("http://localhost:5000")  #uri
-			print(f'Waiting for you to launch in a console: mlflow ui, then you can go to: {mlflow.get_tracking_uri()})')  #should have a uri output, do i have to start mlflow before?
+			if mlflow_enabled == True:
+				# print(f'Waiting for you to launch in a console: mlflow ui, then you can go to: {mlflow.get_tracking_uri()})')  #should have a uri output, do i have to start mlflow before?
 
-			with mlflow.start_run(run_name=group_key):
+				with mlflow.start_run(run_name=group_key):
+					grid_search.fit(X_train, y_train)
+
+
+					best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
+					best_score = float(grid_search.best_score_)  # Ensure it's a Python float
+					
+					mlflow.set_experiment(f"{group_key}")
+					mlflow.log_param('group_key', group_key)
+					mlflow.log_params(best_params)
+					mlflow.log_metric('best_cross_val_accuracy', best_score)
+
+
+					print("Best Parameters:")
+					print(best_params)
+					print(f"Best Cross-Validation Accuracy: {best_score:.2f}")
+
+
+					signature = infer_signature(X_train, y_train)
+					best_pipeline = grid_search.best_estimator_
+					model_filename = f"../models/pipe_{group_key}.joblib"
+					joblib.dump(best_pipeline, model_filename)
+
+					mlflow.sklearn.log_model(
+						sk_model=best_pipeline, 
+						artifact_path='models', 
+						signature=signature, 
+						registered_model_name=f"model_{group_key}"
+					)
+			else:
 				grid_search.fit(X_train, y_train)
-
 
 				best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
 				best_score = float(grid_search.best_score_)  # Ensure it's a Python float
-				
-				mlflow.set_experiment(f"{group_key}")
-				mlflow.log_param('group_key', group_key)
-				mlflow.log_params(best_params)
-				mlflow.log_metric('best_cross_val_accuracy', best_score)
-
-
-				print("Best Parameters:")
-				print(best_params)
-				print(f"Best Cross-Validation Accuracy: {best_score:.2f}")
-
-
-				signature = infer_signature(X_train, y_train)
 				best_pipeline = grid_search.best_estimator_
+
+				#console log maybe?
 				model_filename = f"../models/pipe_{group_key}.joblib"
 				joblib.dump(best_pipeline, model_filename)
+				print(f'best score is: {best_score}, with the best pipeline estimator of: {best_pipeline}.\nModel saved to: ../models/pipe_{group_key}.joblib')
 
-				mlflow.sklearn.log_model(
-					sk_model=best_pipeline, 
-					artifact_path='models', 
-					signature=signature, 
-					registered_model_name=f"model_{group_key}"
-				)
+
+
+			# pipeline.fit(trained_extracted_features, trained_extracted_labels)
+			# shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
+			# # # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
+			# # # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_)
+			# scores = cross_val_score(
+			# 	pipeline, trained_extracted_features, 
+			# 	trained_extracted_labels,  
+			# 	scoring='accuracy', 
+			# 	cv=shuffle_split_validation
+			# )
+			
+			# print(scores)
+			# print(f'Average accuracy: {scores.mean()}')
 
 
 	except FileNotFoundError as e:

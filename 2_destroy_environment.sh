@@ -55,7 +55,7 @@ cleanup() {
     #remover models
     if [ -d "$MODELS_DIR" ]; then
         echo "Removing contents of directory at $MODELS_DIR..."
-        rm "$MODELS_DIR"/*.joblib
+        rm -f "$MODELS_DIR"/*.joblib
     else
         echo "MLFLOW directory not found at $MLRUNS_DIR."
     fi
@@ -72,5 +72,5 @@ cleanup() {
     echo "Cleanup complete."
 }
 
-# Run the cleanup function
+#run the cleanup function
 cleanup
