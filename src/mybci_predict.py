@@ -28,6 +28,7 @@ import time
 from custom_scaler import CustomScaler
 from reshaper import Reshaper
 
+from command_line_parser import CommandLineParser
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
@@ -580,16 +581,16 @@ def main():
 	try:
 		argument_config = [
 			{
-				'name'='--plot_eeg_predictions',
-				'type'=str,
-				'default'= 'false'
-				'choices'=['true', 'false'],
-				'help'='Enable (True) or disable (False) the visual representation of the EEG data with it\s associated prediction.\n'
+				'name':'--plot_eeg_predictions',
+				'type':str,
+				'default': 'false',
+				'choices': ['true', 'false'],
+				'help': 'Enable (True) or disable (False) the visual representation of the EEG data with its associated prediction.\n'
 			}
 		]
 		arg_parser = CommandLineParser(argument_config)
 		plot_eeg_predictions_enabled = arg_parser.parse_arguments()
-		
+
 		#preprocess data
 		dataset_preprocessor_instance = Preprocessor()
 		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict)
@@ -600,8 +601,8 @@ def main():
 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 		run_groups = epoch_extractor_instance.experiments_list
 
-
 		i = 0
+		total_mean_accuracy_over_all_experiments = np.array([])
 		for group in run_groups:
 			groups_runs = group['runs']
 			group_key = f"runs_{'_'.join(map(str, groups_runs))}"
@@ -680,15 +681,10 @@ def main():
 
 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
 			print(f'{total_accuracy_on_this_test_set} is the total accuracy on this test set. Now we test with cross validation.')
-	
-			# shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
-			# scores = cross_val_score(
-			# 	pipeline, test_extracted_features, 
-			# 	labels_predict[run_keys[0]], 
-			# 	scoring='accuracy', 
-			# 	cv=shuffle_split_validation
-			# )
 
+			if (feature_extraction_method == 'events'):
+				total_mean_accuracy_over_all_experiments = np.append(total_mean_accuracy_over_all_experiments, total_accuracy_on_this_test_set)
+	
 
 			kfold = KFold(n_splits=5, shuffle=True, random_state=0)
 			scores = cross_val_score(
@@ -700,8 +696,11 @@ def main():
 
 			print(scores)
 			print(f"\033[92mAverage accuracy with cross-validation for group: {groups_runs}: {scores.mean():.2f}\033[0m")
-
-		# time.sleep()
+	
+		print(f"\033[92mMean accuracy of 4 experiments: {np.mean(total_mean_accuracy_over_all_experiments)}")
+		total_mean_accuracy_over_all_experiments = np.append(total_mean_accuracy_over_all_experiments, [1.0, 1.0])
+		print(f"Mean accuracy over 6 experiments: {np.mean(total_mean_accuracy_over_all_experiments)}\033[0m")
+		
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")
 	except PermissionError as e:

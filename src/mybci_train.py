@@ -163,20 +163,19 @@ train = [
 	"../data/S021/S021R03.edf",
 	"../data/S021/S021R07.edf",
 	"../data/S021/S021R11.edf",
+	"../data/S022/S022R03.edf",
+	"../data/S022/S022R07.edf",
+	"../data/S022/S022R11.edf",
+	"../data/S023/S023R03.edf",
+	"../data/S023/S023R07.edf",
+	"../data/S023/S023R11.edf",
+	"../data/S024/S024R03.edf",
+	"../data/S024/S024R07.edf",
+	"../data/S024/S024R11.edf",
+	"../data/S025/S025R03.edf",
+	"../data/S025/S025R07.edf",
+	"../data/S025/S025R11.edf",
 
-
-	# "../data/S022/S022R03.edf",
-	# "../data/S022/S022R07.edf",
-	# "../data/S022/S022R11.edf",
-	# "../data/S023/S023R03.edf",
-	# "../data/S023/S023R07.edf",
-	# "../data/S023/S023R11.edf",
-	# "../data/S024/S024R03.edf",
-	# "../data/S024/S024R07.edf",
-	# "../data/S024/S024R11.edf",
-	# "../data/S025/S025R03.edf",
-	# "../data/S025/S025R07.edf",
-	# "../data/S025/S025R11.edf",
 	# "../data/S026/S026R03.edf",
 	# "../data/S026/S026R07.edf",
 	# "../data/S026/S026R11.edf",
@@ -349,23 +348,23 @@ train = [
 	"../data/S019/S019R12.edf",
 	"../data/S020/S020R04.edf",
 	"../data/S020/S020R08.edf",
+	"../data/S020/S020R12.edf",
+	"../data/S021/S021R04.edf",
+	"../data/S021/S021R08.edf",
+	"../data/S021/S021R12.edf",
+	"../data/S022/S022R04.edf",
+	"../data/S022/S022R08.edf",
+	"../data/S022/S022R12.edf",
+	"../data/S023/S023R04.edf",
+	"../data/S023/S023R08.edf",
+	"../data/S023/S023R12.edf",
+	"../data/S024/S024R04.edf",
+	"../data/S024/S024R08.edf",
+	"../data/S024/S024R12.edf",
+	"../data/S025/S025R04.edf",
+	"../data/S025/S025R08.edf",
+	"../data/S025/S025R12.edf",
 
-# 	"../data/S020/S020R12.edf",
-# 	"../data/S021/S021R04.edf",
-# 	"../data/S021/S021R08.edf",
-# 	"../data/S021/S021R12.edf",
-# 	"../data/S022/S022R04.edf",
-# 	"../data/S022/S022R08.edf",
-# 	"../data/S022/S022R12.edf",
-# 	"../data/S023/S023R04.edf",
-# 	"../data/S023/S023R08.edf",
-# 	"../data/S023/S023R12.edf",
-# 	"../data/S024/S024R04.edf",
-# 	"../data/S024/S024R08.edf",
-# 	"../data/S024/S024R12.edf",
-# 	"../data/S025/S025R04.edf",
-# 	"../data/S025/S025R08.edf",
-# 	"../data/S025/S025R12.edf",
 # 	"../data/S026/S026R04.edf",
 # 	"../data/S026/S026R08.edf",
 # 	"../data/S026/S026R12.edf",
@@ -686,22 +685,21 @@ train = [
 	"../data/S020/S020R05.edf",
 	"../data/S020/S020R09.edf",
 	"../data/S020/S020R13.edf",
+	"../data/S021/S021R05.edf",
+	"../data/S021/S021R09.edf",
+	"../data/S021/S021R13.edf",
+	"../data/S022/S022R05.edf",
+	"../data/S022/S022R09.edf",
+	"../data/S022/S022R13.edf",
+	"../data/S023/S023R05.edf",
+	"../data/S023/S023R09.edf",
+	"../data/S023/S023R13.edf",
+	"../data/S024/S024R05.edf",
+	"../data/S024/S024R09.edf",
+	"../data/S024/S024R13.edf",
+	"../data/S025/S025R05.edf",
+	"../data/S025/S025R09.edf",
 
-
-	# "../data/S021/S021R05.edf",
-	# "../data/S021/S021R09.edf",
-	# "../data/S021/S021R13.edf",
-	# "../data/S022/S022R05.edf",
-	# "../data/S022/S022R09.edf",
-	# "../data/S022/S022R13.edf",
-	# "../data/S023/S023R05.edf",
-	# "../data/S023/S023R09.edf",
-	# "../data/S023/S023R13.edf",
-	# "../data/S024/S024R05.edf",
-	# "../data/S024/S024R09.edf",
-	# "../data/S024/S024R13.edf",
-	# "../data/S025/S025R05.edf",
-	# "../data/S025/S025R09.edf",
 	# "../data/S025/S025R13.edf",
 	# "../data/S026/S026R05.edf",
 	# "../data/S026/S026R09.edf",
@@ -1486,10 +1484,11 @@ def main():
 				'help':'Enable (True) or disable (False) the mlflow server for tracking model analysis. Default is False.\n'
 			}
 		]
+		#cli parser
 		arg_parser = CommandLineParser(argument_config)
 		mlflow_enabled = arg_parser.parse_arguments()
-		print(f'{mlflow_enabled} is the command line argument')
 		if (mlflow_enabled == True):
+			print(f'MLFLOW enabled: go to localhost:5000 to see model metrics.') #green color?
 			initate_mlflow_environment()
 
 		#data processing
@@ -1532,7 +1531,6 @@ def main():
 										random_state=42
 			)
 
-
 			pipeline = Pipeline([
 				('scaler', custom_scaler),
 				('reshaper', reshaper),
@@ -1541,64 +1539,95 @@ def main():
 			])
 		
 
-			grid_search_params = [
-				#MLP
-				{
-					'classifier': [MLPClassifier(
-						max_iter=10000,
-						early_stopping=True,
-						n_iter_no_change=50, #if it doesnt improve for 10 epochs
-						verbose=False)],
-					'pca__n_comps': [20,42,50],
-					#hidden layers of multilayer perceptron class
-					'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 30)],
-					#relu->helps mitigate vanishing gradients, faster convergence
-					#tanh->hyperbolic tangent, outputs centered around zero
-					'classifier__activation': ['relu', 'tanh'],
-					#adam, efficient for large datasets, adapts learning rates
-					#stochastic gradient, generalize better, slower convergence
-					'classifier__solver': ['adam', 'sgd'],
-					'classifier__learning_rate_init': [0.001, 0.01, 0.1]
+			classifier_mapping = {
+				'MLPClassifier': MLPClassifier(
+					max_iter=10000,
+					early_stopping=True,
+					n_iter_no_change=50,  # Stops training if no improvement for 50 epochs
+					verbose=False
+				),
+				'SVC': SVC(),
+				'RandomForestClassifier': RandomForestClassifier(),
+				'LogisticRegression': LogisticRegression(),
+				'DecisionTreeClassifier': DecisionTreeClassifier()
+			}
 
-				},
 
-				# SVC
-				{
-					'classifier': [SVC()],
-					'pca__n_comps': [20, 42, 50],
-					'classifier__C': [0.1, 1, 8],
-					'classifier__kernel': ['linear', 'rbf']
-				},
+			import yaml
+			with open('../configs/grid_search_parameters.yaml', 'r') as f:
+				config = yaml.safe_load(f)
+		
+
+			for param_set in config['grid_search_params']:
+				classifier_name = param_set['classifier']
+				print(classifier_name)
+				if classifier_name in classifier_mapping:
+					param_set['classifier'] = [classifier_mapping[classifier_name]]
+				if classifier_name == "MLPClassifier" and "classifier__hidden_layer_sizes" not in param_set:
+					raise ValueError("Missing 'hidden_layer_sizes' for MLPClassifier")
+				else:
+					# raise ValueError(f"Unkown clasifier: {classifier_name}.)
+					print('error, quitting.')
+					sys.exit(1)
+
+			# grid_search_params = [
+			# 	#MLP
+			# 	{
+			# 		'classifier': [MLPClassifier(
+			# 			max_iter=10000,
+			# 			early_stopping=True,
+			# 			n_iter_no_change=50, #if it doesnt improve for 10 epochs
+			# 			verbose=False)],
+			# 		'pca__n_comps': [20,42,50],
+			# 		#hidden layers of multilayer perceptron class
+			# 		'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 30)],
+			# 		#relu->helps mitigate vanishing gradients, faster convergence
+			# 		#tanh->hyperbolic tangent, outputs centered around zero
+			# 		'classifier__activation': ['relu', 'tanh'],
+			# 		#adam, efficient for large datasets, adapts learning rates
+			# 		#stochastic gradient, generalize better, slower convergence
+			# 		'classifier__solver': ['adam', 'sgd'],
+			# 		'classifier__learning_rate_init': [0.001, 0.01, 0.1]
+
+			# 	},
+
+			# 	# SVC
+			# 	{
+			# 		'classifier': [SVC()],
+			# 		'pca__n_comps': [20, 42, 50],
+			# 		'classifier__C': [0.1, 1, 8],
+			# 		'classifier__kernel': ['linear', 'rbf']
+			# 	},
 				
-				# RANDOM FOREST
-				{
-					'classifier': [RandomForestClassifier()],
-					'pca__n_comps': [20, 42],
-					'classifier__n_estimators': [50, 100, 200],
-					'classifier__max_depth': [None, 10, 20]
-				},
-				#DECISION TREE
-				{
-					'pca__n_comps': [20, 42],
-					'classifier': [DecisionTreeClassifier()],
-					'classifier__max_depth': [None, 10, 20],
-					'classifier__min_samples_split': [2, 5, 10]
-				},
-				# Logistic Regression
-				{
-					'classifier': [LogisticRegression()],
-					'pca__n_comps': [20, 42, 50],
-					'classifier__C': [0.1, 1, 10],
-					'classifier__penalty': ['l1', 'l2'],
-					'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
-					'classifier__max_iter': [1000, 5000]
-				}
-			]
+			# 	# RANDOM FOREST
+			# 	{
+			# 		'classifier': [RandomForestClassifier()],
+			# 		'pca__n_comps': [20, 42],
+			# 		'classifier__n_estimators': [50, 100, 200],
+			# 		'classifier__max_depth': [None, 10, 20]
+			# 	},
+			# 	#DECISION TREE
+			# 	{
+			# 		'pca__n_comps': [20, 42],
+			# 		'classifier': [DecisionTreeClassifier()],
+			# 		'classifier__max_depth': [None, 10, 20],
+			# 		'classifier__min_samples_split': [2, 5, 10]
+			# 	},
+			# 	# Logistic Regression
+			# 	{
+			# 		'classifier': [LogisticRegression()],
+			# 		'pca__n_comps': [20, 42, 50],
+			# 		'classifier__C': [0.1, 1, 10],
+			# 		'classifier__penalty': ['l1', 'l2'],
+			# 		'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
+			# 		'classifier__max_iter': [1000, 5000]
+			# 	}
+			# ]
 
 
 			grid_search = GridSearchCV(
 				estimator=pipeline,
-				param_grid=grid_search_params,
+				param_grid=config['grid_search_params'],
 				cv=9,  #9fold cross-val
 				scoring='accuracy',  #evalmetric
 				n_jobs=-1,  #util all all available cpu cores
@@ -1606,13 +1635,8 @@ def main():
 				refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
 			)
 
-			#just to use standard variables
-			# X_train = trained_extracted_features
-			# y_train = trained_extracted_labels
-
 			if mlflow_enabled == True:
 				# print(f'Waiting for you to launch in a console: mlflow ui, then you can go to: {mlflow.get_tracking_uri()})')  #should have a uri output, do i have to start mlflow before?
-
 				with mlflow.start_run(run_name=group_key):
 					grid_search.fit(X_train, y_train)
 
@@ -1654,21 +1678,17 @@ def main():
 				joblib.dump(best_pipeline, model_filename)
 				print(f'best score is: {best_score}, with the best pipeline estimator of: {best_pipeline}.\nModel saved to: ../models/pipe_{group_key}.joblib')
 
+				kfold = KFold(n_splits=5, shuffle=True, random_state=0)
+				scores = cross_val_score(
+					pipeline, X_train, 
+					y_train, 
+					scoring='accuracy', 
+					cv=kfold
+				)
 
+				print(scores)
+				print(f"\033[92mAverage accuracy with cross-validation for group: {groups_runs}: {scores.mean():.2f}\033[0m")
 
-			# pipeline.fit(trained_extracted_features, trained_extracted_labels)
-			# shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
-			# # # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
-			# # # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_)
-			# scores = cross_val_score(
-			# 	pipeline, trained_extracted_features, 
-			# 	trained_extracted_labels,  
-			# 	scoring='accuracy', 
-			# 	cv=shuffle_split_validation
-			# )
-			
-			# print(scores)
-			# print(f'Average accuracy: {scores.mean()}')
 
 
 	except FileNotFoundError as e:

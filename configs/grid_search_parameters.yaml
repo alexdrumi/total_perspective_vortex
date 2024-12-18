@@ -1,0 +1,36 @@
+grid_search_params:
+- 'classifier': "MLPClassifier" #where is early stopping in this then?
+  'pca__n_comps': [20,42,50]
+  'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 30)]
+  'classifier__activation': ['relu', 'tanh']
+  'classifier__solver': ['adam', 'sgd']
+  'classifier__learning_rate_init': [0.001, 0.01, 0.1]
+
+
+- 'classifier': "LogisticRegression"
+  'pca__n_comps': [20, 42, 50]
+  'classifier__C': [0.1, 1, 10]
+  'classifier__penalty': ['l1', 'l2']
+  'classifier__solver': ['liblinear']
+  'classifier__max_iter': [1000, 5000]
+
+
+- 'classifier': "SVC"
+  'pca__n_comps': [20, 42, 50]
+  'classifier__C': [0.1, 1, 8]
+  'classifier__kernel': ['linear', 'rbf']
+
+
+- 'classifier': "RandomForestClassifier"
+  'pca__n_comps': [20, 42]
+  'classifier__n_estimators': [50, 100, 200]
+  'classifier__max_depth': [None, 10, 20]
+
+  
+- 'classifier': "DecisionTreeClassifier"
+  'classifier__max_depth': [None, 10, 20]
+  'classifier__min_samples_split': [2, 5, 10]
+  'pca__n_comps': [20, 42]
+
+
+
