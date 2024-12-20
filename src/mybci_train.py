@@ -7,6 +7,8 @@ import joblib
 import logging
 from pathlib import Path
 import time
+import yaml
+
 
 from sklearn.preprocessing import StandardScaler, FunctionTransformer
 from sklearn.decomposition import PCA
@@ -1473,6 +1475,31 @@ def initate_mlflow_environment():
 	time.sleep(2)
 
 
+
+def create_grid_search_parameters():
+	with open('../configs/grid_search_parameters.yaml', 'r') as f:
+		config = yaml.safe_load(f)
+
+	classifier_mapping = {
+			'MLPClassifier': MLPClassifier(max_iter=10000,early_stopping=True,n_iter_no_change=50,verbose=False),
+			'SVC': SVC(),
+			'RandomForestClassifier': RandomForestClassifier(),
+			'LogisticRegression': LogisticRegression(),
+			'DecisionTreeClassifier': DecisionTreeClassifier()
+		}
+
+	grid_search_params = []
+	for param_set in config['grid_search_params']:
+		classifier_name = param_set['classifier']
+		if classifier_name in classifier_mapping:
+			param_set['classifier'] = [classifier_mapping[classifier_name]] 
+			print(f'{param_set} is gonna be the paramset now')
+			grid_search_params.append(param_set)
+
+	return grid_search_params
+
+
+
 def main():
 	try:
 		argument_config = [
@@ -1484,6 +1511,7 @@ def main():
 				'help':'Enable (True) or disable (False) the mlflow server for tracking model analysis. Default is False.\n'
 			}
 		]
+
 		#cli parser
 		arg_parser = CommandLineParser(argument_config)
 		mlflow_enabled = arg_parser.parse_arguments()
@@ -1538,96 +1566,10 @@ def main():
 				('classifier', mlp_classifier) #mlp will be replaced in grid search
 			])
 		
-
-			classifier_mapping = {
-				'MLPClassifier': MLPClassifier(
-					max_iter=10000,
-					early_stopping=True,
-					n_iter_no_change=50,  # Stops training if no improvement for 50 epochs
-					verbose=False
-				),
-				'SVC': SVC(),
-				'RandomForestClassifier': RandomForestClassifier(),
-				'LogisticRegression': LogisticRegression(),
-				'DecisionTreeClassifier': DecisionTreeClassifier()
-			}
-
-
-			import yaml
-			with open('../configs/grid_search_parameters.yaml', 'r') as f:
-				config = yaml.safe_load(f)
-		
-
-			for param_set in config['grid_search_params']:
-				classifier_name = param_set['classifier']
-				print(classifier_name)
-				if classifier_name in classifier_mapping:
-					param_set['classifier'] = [classifier_mapping[classifier_name]]
-				if classifier_name == "MLPClassifier" and "classifier__hidden_layer_sizes" not in param_set:
-					raise ValueError("Missing 'hidden_layer_sizes' for MLPClassifier")
-				else:
-					# raise ValueError(f"Unkown clasifier: {classifier_name}.)
-					print('error, quitting.')
-					sys.exit(1)
-
-			# grid_search_params = [
-			# 	#MLP
-			# 	{
-			# 		'classifier': [MLPClassifier(
-			# 			max_iter=10000,
-			# 			early_stopping=True,
-			# 			n_iter_no_change=50, #if it doesnt improve for 10 epochs
-			# 			verbose=False)],
-			# 		'pca__n_comps': [20,42,50],
-			# 		#hidden layers of multilayer perceptron class
-			# 		'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 30)],
-			# 		#relu->helps mitigate vanishing gradients, faster convergence
-			# 		#tanh->hyperbolic tangent, outputs centered around zero
-			# 		'classifier__activation': ['relu', 'tanh'],
-			# 		#adam, efficient for large datasets, adapts learning rates
-			# 		#stochastic gradient, generalize better, slower convergence
-			# 		'classifier__solver': ['adam', 'sgd'],
-			# 		'classifier__learning_rate_init': [0.001, 0.01, 0.1]
-
-			# 	},
-
-			# 	# SVC
-			# 	{
-			# 		'classifier': [SVC()],
-			# 		'pca__n_comps': [20, 42, 50],
-			# 		'classifier__C': [0.1, 1, 8],
-			# 		'classifier__kernel': ['linear', 'rbf']
-			# 	},
-				
-			# 	# RANDOM FOREST
-			# 	{
-			# 		'classifier': [RandomForestClassifier()],
-			# 		'pca__n_comps': [20, 42],
-			# 		'classifier__n_estimators': [50, 100, 200],
-			# 		'classifier__max_depth': [None, 10, 20]
-			# 	},
-			# 	#DECISION TREE
-			# 	{
-			# 		'pca__n_comps': [20, 42],
-			# 		'classifier': [DecisionTreeClassifier()],
-			# 		'classifier__max_depth': [None, 10, 20],
-			# 		'classifier__min_samples_split': [2, 5, 10]
-			# 	},
-			# 	# Logistic Regression
-			# 	{
-			# 		'classifier': [LogisticRegression()],
-			# 		'pca__n_comps': [20, 42, 50],
-			# 		'classifier__C': [0.1, 1, 10],
-			# 		'classifier__penalty': ['l1', 'l2'],
-			# 		'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
-			# 		'classifier__max_iter': [1000, 5000]
-			# 	}
-			# ]
-
-
+			grid_search_params = create_grid_search_parameters()
 			grid_search = GridSearchCV(
 				estimator=pipeline,
-				param_grid=config['grid_search_params'],
+				param_grid=grid_search_params,
 				cv=9,  #9fold cross-val
 				scoring='accuracy',  #evalmetric
 				n_jobs=-1,  #util all all available cpu cores
@@ -1913,3 +1855,61 @@ def main():
 if __name__ == '__main__':
 	main()
 '''
+
+
+
+
+#2024.12.20
+# grid_search_params = [
+# 	#MLP
+# 	{
+# 		'classifier': [MLPClassifier(
+# 			max_iter=10000,
+# 			early_stopping=True,
+# 			n_iter_no_change=50, #if it doesnt improve for 10 epochs
+# 			verbose=False)],
+# 		'pca__n_comps': [20,42,50],
+# 		#hidden layers of multilayer perceptron class
+# 		'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 30)],
+# 		#relu->helps mitigate vanishing gradients, faster convergence
+# 		#tanh->hyperbolic tangent, outputs centered around zero
+# 		'classifier__activation': ['relu', 'tanh'],
+# 		#adam, efficient for large datasets, adapts learning rates
+# 		#stochastic gradient, generalize better, slower convergence
+# 		'classifier__solver': ['adam', 'sgd'],
+# 		'classifier__learning_rate_init': [0.001, 0.01, 0.1]
+
+# 	},
+
+# 	# SVC
+# 	{
+# 		'classifier': [SVC()],
+# 		'pca__n_comps': [20, 42, 50],
+# 		'classifier__C': [0.1, 1, 8],
+# 		'classifier__kernel': ['linear', 'rbf']
+# 	},
+	
+# 	# RANDOM FOREST
+# 	{
+# 		'classifier': [RandomForestClassifier()],
+# 		'pca__n_comps': [20, 42],
+# 		'classifier__n_estimators': [50, 100, 200],
+# 		'classifier__max_depth': [None, 10, 20]
+# 	},
+# 	#DECISION TREE
+# 	{
+# 		'pca__n_comps': [20, 42],
+# 		'classifier': [DecisionTreeClassifier()],
+# 		'classifier__max_depth': [None, 10, 20],
+# 		'classifier__min_samples_split': [2, 5, 10]
+# 	},
+# 	# Logistic Regression
+# 	{
+# 		'classifier': [LogisticRegression()],
+# 		'pca__n_comps': [20, 42, 50],
+# 		'classifier__C': [0.1, 1, 10],
+# 		'classifier__penalty': ['l1', 'l2'],
+# 		'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
+# 		'classifier__max_iter': [1000, 5000]
+# 	}
+# ]
