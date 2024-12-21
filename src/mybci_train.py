@@ -27,6 +27,7 @@ from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold, GridSe
 import mlflow
 import mlflow.sklearn
 from mlflow.models.signature import infer_signature
+from mlflow_manager import MlflowManager
 
 from dataset_preprocessor import Preprocessor
 from feature_extractor import FeatureExtractor
@@ -1468,43 +1469,41 @@ train = [
 #--------------------------------------------------------------------------------------------------------------------------
 
 
-def initate_mlflow_environment():
-	subprocess.Popen(["mlflow", "ui"])
-	mlflow.set_tracking_uri("http://localhost:5000")  #uri
-	print('mlfow is running on http://localhost:5000", here you can follow the model metrics.')
-	time.sleep(2)
+# def initate_mlflow_environment():
+# 	subprocess.Popen(["mlflow", "ui"])
+# 	mlflow.set_tracking_uri("http://localhost:5000")  #uri
+# 	print('mlfow is running on http://localhost:5000", here you can follow the model metrics.')
+# 	time.sleep(2)
 
 
 
-def create_grid_search_parameters():
-	with open('../configs/grid_search_parameters.yaml', 'r') as f:
-		config = yaml.safe_load(f)
+# def create_grid_search_parameters():
+# 	with open('../configs/grid_search_parameters.yaml', 'r') as f:
+# 		config = yaml.safe_load(f)
 
-	classifier_mapping = {
-			'MLPClassifier': MLPClassifier(max_iter=10000,early_stopping=True,n_iter_no_change=50,verbose=False),
-			'SVC': SVC(),
-			'RandomForestClassifier': RandomForestClassifier(),
-			'LogisticRegression': LogisticRegression(),
-			'DecisionTreeClassifier': DecisionTreeClassifier()
-		}
+# 	classifier_mapping = {
+# 			'MLPClassifier': MLPClassifier(max_iter=10000,early_stopping=True,n_iter_no_change=50,verbose=False),
+# 			'SVC': SVC(),
+# 			'RandomForestClassifier': RandomForestClassifier(),
+# 			'LogisticRegression': LogisticRegression(),
+# 			'DecisionTreeClassifier': DecisionTreeClassifier()
+# 		}
 
-	grid_search_params = []
-	for param_set in config['grid_search_params']:
-		classifier_name = param_set['classifier']
-		if classifier_name in classifier_mapping:
-			param_set['classifier'] = [classifier_mapping[classifier_name]] 
-			print(f'{param_set} is gonna be the paramset now')
-			grid_search_params.append(param_set)
+# 	grid_search_params = []
+# 	for param_set in config['grid_search_params']:
+# 		classifier_name = param_set['classifier']
+# 		if classifier_name in classifier_mapping:
+# 			param_set['classifier'] = [classifier_mapping[classifier_name]] 
+# 			print(f'{param_set} is gonna be the paramset now')
+# 			grid_search_params.append(param_set)
 
-	return grid_search_params
-
-
+# 	return grid_search_params
 
 def main():
 	try:
 		argument_config = [
 			{
-				'name': '--mlfow',
+				'name': '--mlflow',
 				'type': str,
 				'default': 'false',
 				'choices': ['true', 'false'],
@@ -1515,6 +1514,7 @@ def main():
 		#cli parser
 		arg_parser = CommandLineParser(argument_config)
 		mlflow_enabled = arg_parser.parse_arguments()
+		print(mlflow_enabled)
 		if (mlflow_enabled == True):
 			print(f'MLFLOW enabled: go to localhost:5000 to see model metrics.') #green color?
 			initate_mlflow_environment()
@@ -1549,65 +1549,82 @@ def main():
 			X_train = feature_extractor_instance.extract_features(epochs_dict[run_keys[0]], feature_extraction_method) #trained_extracted_features, for now groups runs[0] is ok but at 13 etc it wont be
 			y_train = labels_dict[run_keys[0]] #trained_extracted_labels
 			
-
+			
 			#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
-			custom_scaler = CustomScaler()
-			reshaper = Reshaper()
-			my_pca = My_PCA(n_comps=100)
-			mlp_classifier = MLPClassifier(hidden_layer_sizes=(20,10),
-										max_iter=16000,
-										random_state=42
-			)
+			# custom_scaler = CustomScaler()
+			# reshaper = Reshaper()
+			# my_pca = My_PCA(n_comps=100)
+			# mlp_classifier = MLPClassifier(hidden_layer_sizes=(20,10),
+			# 							max_iter=16000,
+			# 							random_state=42
+			# )
 
-			pipeline = Pipeline([
-				('scaler', custom_scaler),
-				('reshaper', reshaper),
-				('pca', my_pca),
-				('classifier', mlp_classifier) #mlp will be replaced in grid search
-			])
-		
-			grid_search_params = create_grid_search_parameters()
-			grid_search = GridSearchCV(
-				estimator=pipeline,
-				param_grid=grid_search_params,
-				cv=9,  #9fold cross-val
-				scoring='accuracy',  #evalmetric
-				n_jobs=-1,  #util all all available cpu cores
-				verbose=1,  #2 would be for detailed output
-				refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
-			)
+			# pipeline = Pipeline([
+			# 	('scaler', custom_scaler),
+			# 	('reshaper', reshaper),
+			# 	('pca', my_pca),
+			# 	('classifier', mlp_classifier) #mlp will be replaced in grid search
+			# ])
+
+			from pipeline_builder import PipelineBuilder
+			pipeline_builder = PipelineBuilder(n_components = 40)
+			pipeline = pipeline_builder.build_pipeline()
+
+			from grid_search_manager import GridSearchManager
+			
+			grid_search_manager = GridSearchManager()
+			grid_search = grid_search_manager.create_grid_search(pipeline)
+
+			# grid_search_params = create_grid_search_parameters()
+			# grid_search = GridSearchCV(
+			# 	estimator=pipeline,
+			# 	param_grid=grid_search_params,
+			# 	cv=9,  #9fold cross-val
+			# 	scoring='accuracy',  #evalmetric
+			# 	n_jobs=-1,  #util all all available cpu cores
+			# 	verbose=1,  #2 would be for detailed output
+			# 	refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
+			# )
+
+			mlflow_manager = MlflowManager()
+			grid_search.fit(X_train, y_train)
+			best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
+			best_score = float(grid_search.best_score_)  # Ensure it's a Python float
+			best_pipeline = grid_search.best_estimator_
+
 
 			if mlflow_enabled == True:
 				# print(f'Waiting for you to launch in a console: mlflow ui, then you can go to: {mlflow.get_tracking_uri()})')  #should have a uri output, do i have to start mlflow before?
 				with mlflow.start_run(run_name=group_key):
-					grid_search.fit(X_train, y_train)
+				# 	grid_search.fit(X_train, y_train)
 
 
-					best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
-					best_score = float(grid_search.best_score_)  # Ensure it's a Python float
+				# 	best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
+				# 	best_score = float(grid_search.best_score_)  # Ensure it's a Python float
 					
-					mlflow.set_experiment(f"{group_key}")
-					mlflow.log_param('group_key', group_key)
-					mlflow.log_params(best_params)
-					mlflow.log_metric('best_cross_val_accuracy', best_score)
+				# 	mlflow.set_experiment(f"{group_key}")
+				# 	mlflow.log_param('group_key', group_key)
+				# 	mlflow.log_params(best_params)
+				# 	mlflow.log_metric('best_cross_val_accuracy', best_score)
 
 
-					print("Best Parameters:")
-					print(best_params)
-					print(f"Best Cross-Validation Accuracy: {best_score:.2f}")
+				# 	print("Best Parameters:")
+				# 	print(best_params)
+				# 	print(f"Best Cross-Validation Accuracy: {best_score:.2f}")
 
 
-					signature = infer_signature(X_train, y_train)
-					best_pipeline = grid_search.best_estimator_
-					model_filename = f"../models/pipe_{group_key}.joblib"
-					joblib.dump(best_pipeline, model_filename)
+				# 	signature = infer_signature(X_train, y_train)
+				# 	best_pipeline = grid_search.best_estimator_
+				# 	model_filename = f"../models/pipe_{group_key}.joblib"
+				# 	joblib.dump(best_pipeline, model_filename)
 
-					mlflow.sklearn.log_model(
-						sk_model=best_pipeline, 
-						artifact_path='models', 
-						signature=signature, 
-						registered_model_name=f"model_{group_key}"
-					)
+				# 	mlflow.sklearn.log_model(
+				# 		sk_model=best_pipeline, 
+				# 		artifact_path='models', 
+				# 		signature=signature, 
+				# 		registered_model_name=f"model_{group_key}"
+				# 	)
+					mlflow_manager.log_mlflow_experiment(group_key, best_params, best_score, best_pipeline, X_train, y_train)
 			else:
 				grid_search.fit(X_train, y_train)
 
@@ -1651,18 +1668,38 @@ if __name__ == '__main__':
 
 
 
+#create a facade which has all the subsystems
+class ExperimentTrainerFacade(self, config_path='../configs/grid_search_parameters.yaml', mlflow_enabled=False):
+	self.command_line_parser = CommandLineParser({
+				'name': '--mlfow',
+				'type': str,
+				'default': 'false',
+				'choices': ['true', 'false'],
+				'help':'Enable (True) or disable (False) the mlflow server for tracking model analysis. Default is False.\n'
+			})
+	self.mlflow_manager = MlflowManager()
+	self.data_preprocessor = Preprocessor()
+	self.epoch_extractor = 
+	self.pipeline_executor =
+	self.grid_search_loader =
 
 
+	def run_experiment(self):
+		try:
+			mlflow_enabled = self.command_line_parser.arg_parser.parse_arguments()
+			if (mlflow_enabled == True):
+				self.mlflow_manager.start_mlflow_server()
+
+		#load data
+		raw_data = self.data_preprocessor.load_raw_data(data_path=train)
+		filtered_data = dataset_preprocessor_instance.filter_raw_data(raw_data) #this returns a triplet now
+
+		#extract epochs and associated labels
+		epochs_dict, labels_dict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
 
 
-
-
-
-
-
-
-
-
+	def run_groups(self):
+		run_groups = epoch_extractor_instance.experiments_list
 
 
 
