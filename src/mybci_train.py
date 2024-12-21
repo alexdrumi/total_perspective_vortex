@@ -1499,6 +1499,8 @@ train = [
 
 # 	return grid_search_params
 
+
+
 def main():
 	try:
 		argument_config = [
@@ -1667,6 +1669,9 @@ if __name__ == '__main__':
 
 
 
+from pipeline_builder import PipelineBuilder
+from grid_search_manager import GridSearchManager
+from pipeline_executor import PipelineExecutor
 
 #create a facade which has all the subsystems
 class ExperimentTrainerFacade(self, config_path='../configs/grid_search_parameters.yaml', mlflow_enabled=False):
@@ -1679,9 +1684,10 @@ class ExperimentTrainerFacade(self, config_path='../configs/grid_search_paramete
 			})
 	self.mlflow_manager = MlflowManager()
 	self.data_preprocessor = Preprocessor()
-	self.epoch_extractor = 
-	self.pipeline_executor =
-	self.grid_search_loader =
+	self.epoch_extractor = EpochExtractor()
+	self.pipeline_executor = PipelineExecutor()
+	self.pipeline_builder = PipelineBuilder(n_components=40)
+	self.grid_search_manager = GridSearchManager()
 
 
 	def run_experiment(self):
@@ -1696,11 +1702,38 @@ class ExperimentTrainerFacade(self, config_path='../configs/grid_search_paramete
 
 		#extract epochs and associated labels
 		epochs_dict, labels_dict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
-
-
-	def run_groups(self):
 		run_groups = epoch_extractor_instance.experiments_list
 
+
+
+
+	def process_run_groups(self, run_groups):
+		for groups in run_groups:
+			groups_runs = groups['runs']
+			group_key = f'runs_{"_".join(map(str, groups_runs))}'
+			print(f"\nProcessing group: {group_key} with runs {groups_runs[0]}")
+
+			run_keys = [run_key for run_key in epochs_dict.keys() if int(run_key[-2:]) in groups_runs]
+			available_runs = [run_key for run_key in run_keys if run_key in epochs_dict]
+
+			if not available_runs:
+				print(f"No available runs for group '{group_key}', skipping.")
+				continue
+			
+			feature_extraction_method = 'baseline' if groups_runs[0] in [1,2] else 'events'
+			
+			#feature extraction
+			feature_extractor_instance = FeatureExtractor()
+			X_train = feature_extractor_instance.extract_features(epochs_dict[run_keys[0]], feature_extraction_method) #trained_extracted_features, for now groups runs[0] is ok but at 13 etc it wont be
+			y_train = labels_dict[run_keys[0]] #trained_extracted_labels
+			
+			#build a pipeline
+			pipeline = pipeline_builder.build_pipeline()
+
+			#run the grid search
+			best_params, best_score, best_pipeline = self.grid_search_manager.run_grid_search(pipeline, X_train, y_train)
+
+			
 
 
 
