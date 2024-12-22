@@ -12,14 +12,15 @@ class CommandLineParser:
 
 
 	def add_arguments(self, argument_config):
-		for arg in argument_config:
+		for arg in argument_config: #for now its only 1 arg but we might extend it
 			self.parser.add_argument(
 				arg['name'], 
-				type=arg['type'],
-				default=arg['default'], 
-				choices= arg['choices'],
-				help=arg['help'])
-	
+				type=arg.get('type', str),  # Keyword arguments with defaults
+				default=arg.get('default'),
+				choices=arg.get('choices'),
+				help=arg.get('help', '')
+			)
+		
 
 	def parse_arguments(self):
 		if len(sys.argv) > 2:

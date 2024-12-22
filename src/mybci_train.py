@@ -1503,9 +1503,9 @@ train = [
 from experiment_trainer import ExperimentTrainerFacade
 
 def main():
-	try:
-		experiment_trainer = ExperimentTrainerFacade()
-		experiment_trainer.run_experiment()
+	# try:
+	experiment_trainer = ExperimentTrainerFacade()
+	experiment_trainer.run_experiment()
 	
 	# try:
 	# 	argument_config = [
@@ -1657,16 +1657,16 @@ def main():
 
 
 
-	except FileNotFoundError as e:
-		logging.error(f"File not found: {e}")
-	except PermissionError as e:
-		logging.error(f"Permission on the file denied: {e}")
-	except IOError as e:
-		logging.error(f"Error reading the data file: {e}")
-	except ValueError as e:
-		logging.error(f"Invalid EDF data: {e}")
-	except TypeError as e:
-			logging.error(f"{e}")
+	# except FileNotFoundError as e:
+	# 	logging.error(f"File not found: {e}")
+	# except PermissionError as e:
+	# 	logging.error(f"Permission on the file denied: {e}")
+	# except IOError as e:
+	# 	logging.error(f"Error reading the data file: {e}")
+	# except ValueError as e:
+	# 	logging.error(f"Invalid EDF data: {e}")
+	# except TypeError as e:
+	# 		logging.error(f"{e}")
 
 if __name__ == '__main__':
 	main()

@@ -7,6 +7,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold, GridSearchCV
 
 import yaml
+import numpy as np
 
 class GridSearchManager():
 	def __init__(self):
@@ -57,17 +58,18 @@ class GridSearchManager():
 	
 
 
-	def get_grid_search_results(self):
-		best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in self.grid_search.best_params_.items()}
-		best_score = float(self.grid_search.best_score_)  # Ensure it's a Python float
+	def get_grid_search_results(self, grid_search):
+		best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
+		best_score = float(grid_search.best_score_)  # Ensure it's a Python float
 		best_pipeline = grid_search.best_estimator_
 
 		return best_params, best_score, best_pipeline
 
 
 	def run_grid_search(self, pipeline, X_train, y_train):
-		grid_search = self.grid_search_manager.create_grid_search(pipeline)
-		self.grid_search.fit(X_train, y_train)
+		grid_search = self.create_grid_search(pipeline)
+		grid_search.fit(X_train, y_train)
 
-		best_params, best_score, best_pipeline = get_grid_search_results()
+		best_params, best_score, best_pipeline = self.get_grid_search_results(grid_search)
 		
+		return best_params, best_score, best_pipeline
