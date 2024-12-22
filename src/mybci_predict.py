@@ -16,6 +16,10 @@ from sklearn.model_selection import KFold
 
 from dataset_preprocessor import Preprocessor
 from feature_extractor import FeatureExtractor
+from experiment_predictor import ExperimentPredictor
+from myapp import MyApp
+from epoch_concatenator import EpochConcatenator
+
 
 import joblib
 import logging
@@ -577,138 +581,154 @@ def display_epoch_stats(start, chunk_size, current_pred, current_labels):
 		outcome = 'Left' if truth == 0 else 'Right'
 
 
+# def main():
+# 	try:
+# 		argument_config = [
+# 			{
+# 				'name':'--plot_eeg_predictions',
+# 				'type':str,
+# 				'default': 'false',
+# 				'choices': ['true', 'false'],
+# 				'help': 'Enable (True) or disable (False) the visual representation of the EEG data with its associated prediction.\n'
+# 			}
+# 		]
+# 		arg_parser = CommandLineParser(argument_config)
+# 		plot_eeg_predictions_enabled = arg_parser.parse_arguments()
+
+# 		#preprocess data
+# 		dataset_preprocessor_instance = Preprocessor()
+# 		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict)
+# 		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data)
+
+# 		#extract epochs (events) and labels from data
+# 		epoch_extractor_instance = EpochExtractor()
+# 		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
+# 		run_groups = epoch_extractor_instance.experiments_list
+
+# 		i = 0
+# 		total_mean_accuracy_over_all_experiments = np.array([])
+# 		for group in run_groups:
+# 			groups_runs = group['runs']
+# 			group_key = f"runs_{'_'.join(map(str, groups_runs))}"
+# 			models_to_load = f"../models/pipe_{group_key}.joblib"
+# 			run_keys = list(set([run_key for run_key in epochs_predict.keys() if int(run_key[-2:]) in groups_runs]))
+# 			time.sleep(5)
+# 			available_runs = list[set([run_key for run_key in run_keys if run_key in epochs_predict])]
+
+# 			if len(run_keys) == 0:
+# 				continue
+# 			model_location = models_to_load
+# 			try:
+# 				pipeline = joblib.load(model_location)
+# 				print('Pipeline loaded successfully.')
+# 				# Proceed with using the pipeline
+# 			except FileNotFoundError:
+# 				print(f'Pipeline file not found at {model_location}. Continuing to search another.')
+# 				pipeline = None
+# 				continue
+			
+# 			feature_extraction_method = 'events'
+# 			if (groups_runs[0] == 1 or groups_runs[0] == 2):
+# 				feature_extraction_method = 'baseline'
+
+# 			feature_extractor_instance = FeatureExtractor()
+# 			test_extracted_features = feature_extractor_instance.extract_features(epochs_predict[run_keys[0]], feature_extraction_method) 
+
+# 			i = 0 
+# 			flattened_epochs = epochs_predict[run_keys[0]]
+# 			flattened_labels = labels_predict[run_keys[0]]
+
+# 			chunk_size = 7
+# 			true_predictions_per_chunks = []
+# 			total_chunks = len(flattened_epochs) // chunk_size
+# 			true_predictions_per_chunks = []
+# 			total_correct = 0
+# 			print(f'epoch nb:	[prediction]	[truth]		equal?')
+
+# 			fig, ax = plt.subplots(figsize=(15, 6))
+# 			plt.ion()
+
+# 			for chunk_idx in range(total_chunks):
+# 				start = chunk_idx * chunk_size
+# 				end = start + chunk_size
+# 				current_features = test_extracted_features[start:end]
+# 				current_labels = flattened_labels[start:end]
+# 				current_epochs = flattened_epochs[start:end]
+
+# 				start_time = time.time()
+# 				current_pred = pipeline.predict(current_features)
+				
+# 				print(f"current labels are: {current_labels}\n current predictions are: {current_pred}")
+# 				correct_predictions = np.sum(current_pred == current_labels)
+# 				true_predictions_per_chunks.append(correct_predictions)
+# 				total_correct += correct_predictions
+
+# 				epochs_data = current_epochs
+# 				current_batch_accuracy = correct_predictions/len(current_labels)
+# 				end_time = time.time()
+# 				total_time_for_current_batch = end_time - start_time
+# 				print(f'Current accuracy after processing epoch {start}-{end}: {current_batch_accuracy}.\nPrediction of this batch took: {total_time_for_current_batch} seconds of time.')
+
+# 				label_names = group['mapping']
+# 				if plot_eeg_predictions_enabled == True:
+# 					plot_eeg_epochs_chunk(
+# 						current_batch_idx=chunk_idx,
+# 						epochs_chunk=epochs_data,
+# 						labels_chunk=current_labels,
+# 						predictions_chunk=current_pred,
+# 						label_names=label_names,
+# 						ax=ax,
+# 						alpha=0.3,
+# 						linewidth=0.7
+# 					)
+# 					time.sleep(2)
+
+# 			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
+# 			print(f'{total_accuracy_on_this_test_set} is the total accuracy on this test set. Now we test with cross validation.')
+
+# 			if (feature_extraction_method == 'events'):
+# 				total_mean_accuracy_over_all_experiments = np.append(total_mean_accuracy_over_all_experiments, total_accuracy_on_this_test_set)
+	
+
+# 			kfold = KFold(n_splits=5, shuffle=True, random_state=0)
+# 			scores = cross_val_score(
+# 				pipeline, test_extracted_features, 
+# 				labels_predict[run_keys[0]], 
+# 				scoring='accuracy', 
+# 				cv=kfold
+# 			)
+
+# 			print(scores)
+# 			print(f"\033[92mAverage accuracy with cross-validation for group: {groups_runs}: {scores.mean():.2f}\033[0m")
+	
+# 		print(f"\033[92mMean accuracy of 4 experiments: {np.mean(total_mean_accuracy_over_all_experiments)}")
+# 		total_mean_accuracy_over_all_experiments = np.append(total_mean_accuracy_over_all_experiments, [1.0, 1.0])
+# 		print(f"Mean accuracy over 6 experiments: {np.mean(total_mean_accuracy_over_all_experiments)}\033[0m")
+		
+# 	except FileNotFoundError as e:
+# 		logging.error(f"File not found: {e}")
+# 	except PermissionError as e:
+# 		logging.error(f"Permission on the file denied: {e}")
+# 	except IOError as e:
+# 		logging.error(f"Error reading the data file: {e}")
+# 	except ValueError as e:
+# 		logging.error(f"Invalid EDF data: {e}")
+
+
 def main():
 	try:
-		argument_config = [
-			{
-				'name':'--plot_eeg_predictions',
-				'type':str,
-				'default': 'false',
-				'choices': ['true', 'false'],
-				'help': 'Enable (True) or disable (False) the visual representation of the EEG data with its associated prediction.\n'
-			}
-		]
-		arg_parser = CommandLineParser(argument_config)
-		plot_eeg_predictions_enabled = arg_parser.parse_arguments()
-
-		#preprocess data
-		dataset_preprocessor_instance = Preprocessor()
-		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=predict)
-		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data)
-
-		#extract epochs (events) and labels from data
-		epoch_extractor_instance = EpochExtractor()
-		epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
-		run_groups = epoch_extractor_instance.experiments_list
-
-		i = 0
-		total_mean_accuracy_over_all_experiments = np.array([])
-		for group in run_groups:
-			groups_runs = group['runs']
-			group_key = f"runs_{'_'.join(map(str, groups_runs))}"
-			models_to_load = f"../models/pipe_{group_key}.joblib"
-			run_keys = list(set([run_key for run_key in epochs_predict.keys() if int(run_key[-2:]) in groups_runs]))
-			time.sleep(5)
-			available_runs = list[set([run_key for run_key in run_keys if run_key in epochs_predict])]
-
-			if len(run_keys) == 0:
-				continue
-			model_location = models_to_load
-			try:
-				pipeline = joblib.load(model_location)
-				print('Pipeline loaded successfully.')
-				# Proceed with using the pipeline
-			except FileNotFoundError:
-				print(f'Pipeline file not found at {model_location}. Continuing to search another.')
-				pipeline = None
-				continue
-			
-			feature_extraction_method = 'events'
-			if (groups_runs[0] == 1 or groups_runs[0] == 2):
-				feature_extraction_method = 'baseline'
-
-			feature_extractor_instance = FeatureExtractor()
-			test_extracted_features = feature_extractor_instance.extract_features(epochs_predict[run_keys[0]], feature_extraction_method) 
-
-			i = 0 
-			flattened_epochs = epochs_predict[run_keys[0]]
-			flattened_labels = labels_predict[run_keys[0]]
-
-			chunk_size = 7
-			true_predictions_per_chunks = []
-			total_chunks = len(flattened_epochs) // chunk_size
-			true_predictions_per_chunks = []
-			total_correct = 0
-			print(f'epoch nb:	[prediction]	[truth]		equal?')
-
-			fig, ax = plt.subplots(figsize=(15, 6))
-			plt.ion()
-
-			for chunk_idx in range(total_chunks):
-				start = chunk_idx * chunk_size
-				end = start + chunk_size
-				current_features = test_extracted_features[start:end]
-				current_labels = flattened_labels[start:end]
-				current_epochs = flattened_epochs[start:end]
-
-				start_time = time.time()
-				current_pred = pipeline.predict(current_features)
-				
-				print(f"current labels are: {current_labels}\n current predictions are: {current_pred}")
-				correct_predictions = np.sum(current_pred == current_labels)
-				true_predictions_per_chunks.append(correct_predictions)
-				total_correct += correct_predictions
-
-				epochs_data = current_epochs
-				current_batch_accuracy = correct_predictions/len(current_labels)
-				end_time = time.time()
-				total_time_for_current_batch = end_time - start_time
-				print(f'Current accuracy after processing epoch {start}-{end}: {current_batch_accuracy}.\nPrediction of this batch took: {total_time_for_current_batch} seconds of time.')
-
-				label_names = group['mapping']
-				if plot_eeg_predictions_enabled == True:
-					plot_eeg_epochs_chunk(
-						current_batch_idx=chunk_idx,
-						epochs_chunk=epochs_data,
-						labels_chunk=current_labels,
-						predictions_chunk=current_pred,
-						label_names=label_names,
-						ax=ax,
-						alpha=0.3,
-						linewidth=0.7
-					)
-					time.sleep(2)
-
-			total_accuracy_on_this_test_set = np.sum(true_predictions_per_chunks)/len(test_extracted_features)
-			print(f'{total_accuracy_on_this_test_set} is the total accuracy on this test set. Now we test with cross validation.')
-
-			if (feature_extraction_method == 'events'):
-				total_mean_accuracy_over_all_experiments = np.append(total_mean_accuracy_over_all_experiments, total_accuracy_on_this_test_set)
-	
-
-			kfold = KFold(n_splits=5, shuffle=True, random_state=0)
-			scores = cross_val_score(
-				pipeline, test_extracted_features, 
-				labels_predict[run_keys[0]], 
-				scoring='accuracy', 
-				cv=kfold
-			)
-
-			print(scores)
-			print(f"\033[92mAverage accuracy with cross-validation for group: {groups_runs}: {scores.mean():.2f}\033[0m")
-	
-		print(f"\033[92mMean accuracy of 4 experiments: {np.mean(total_mean_accuracy_over_all_experiments)}")
-		total_mean_accuracy_over_all_experiments = np.append(total_mean_accuracy_over_all_experiments, [1.0, 1.0])
-		print(f"Mean accuracy over 6 experiments: {np.mean(total_mean_accuracy_over_all_experiments)}\033[0m")
-		
+		predict_data_path = predict
+		app = MyApp()
+		app.run(predict_data_path)
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")
 	except PermissionError as e:
-		logging.error(f"Permission on the file denied: {e}")
+		logging.error(f"Permission error: {e}")
 	except IOError as e:
-		logging.error(f"Error reading the data file: {e}")
+		logging.error(f"IO error: {e}")
 	except ValueError as e:
-		logging.error(f"Invalid EDF data: {e}")
+		logging.error(f"Value error: {e}")
+
 
 
 if __name__ == "__main__":

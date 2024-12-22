@@ -70,8 +70,6 @@ mne.set_log_level(verbose='WARNING')
 channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 
 
-
-
 # channels = ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
             # "CP3",
             # "CP1",
@@ -104,8 +102,8 @@ channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 # #"/data/S103/S103R11.edf",
 # ]
 
-train = [
 
+train = [
 	#run 3,7,11
 	"../data/S001/S001R03.edf",
 	"../data/S001/S001R07.edf",
