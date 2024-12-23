@@ -7,7 +7,7 @@ class PipelineExecutor():
 		pass
 
 	def save_model(self, best_pipeline, group_key):
-		model_filename = f"../models/pipe_{group_key}.joblib"
+		model_filename = f"../../models/pipe_{group_key}.joblib"
 		joblib.dump(best_pipeline, model_filename)
 
 

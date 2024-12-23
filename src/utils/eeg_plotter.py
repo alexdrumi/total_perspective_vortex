@@ -2,7 +2,7 @@ import numpy as np
 import mne
 import sys
 import matplotlib.pyplot as plt
-from epoch_concatenator import EpochConcatenator
+from src.data_extraction.epoch_concatenator import EpochConcatenator
 
 
 class EEGPlotter:

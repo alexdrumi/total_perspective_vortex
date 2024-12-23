@@ -9,7 +9,7 @@ file_list = []
 for s in subjects:
     subject_id = f"S{s:03}"  # Formats the subject number with leading zeros, e.g., S001
     for r in runs:
-        file_path = f'"../data/{subject_id}/{subject_id}R{r}.edf",'
+        file_path = f'"../../data/{subject_id}/{subject_id}R{r}.edf",'
         file_list.append(file_path)
 
 # Optionally, print the list in a formatted way

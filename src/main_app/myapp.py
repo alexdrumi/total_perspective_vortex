@@ -1,14 +1,14 @@
-from pipeline_builder import PipelineBuilder
-from grid_search_manager import GridSearchManager
-from pipeline_executor import PipelineExecutor
-from command_line_parser import CommandLineParser
-from feature_extractor import FeatureExtractor
-from mlflow_manager import MlflowManager
-from dataset_preprocessor import Preprocessor
-from epoch_extractor import EpochExtractor
-from experiment_predictor import ExperimentPredictor
-from eeg_plotter import EEGPlotter
-from epoch_concatenator import EpochConcatenator
+from src.pipeline.pipeline_builder import PipelineBuilder
+from src.experiments.grid_search_manager import GridSearchManager
+from src.pipeline.pipeline_executor import PipelineExecutor
+from src.utils.command_line_parser import CommandLineParser
+from src.pipeline.feature_extractor import FeatureExtractor
+from src.mlflow_integration.mlflow_manager import MlflowManager
+from src.data_extraction.dataset_preprocessor import Preprocessor
+from src.data_extraction.epoch_extractor import EpochExtractor
+from src.experiments.experiment_predictor import ExperimentPredictor
+from src.utils.eeg_plotter import EEGPlotter
+from src.data_extraction.epoch_concatenator import EpochConcatenator
 
 import time
 import numpy as np

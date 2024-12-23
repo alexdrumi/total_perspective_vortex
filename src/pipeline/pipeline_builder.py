@@ -1,6 +1,6 @@
-from custom_scaler import CustomScaler
-from reshaper import Reshaper
-from pca import My_PCA
+from src.pipeline.custom_scaler import CustomScaler
+from src.pipeline.reshaper import Reshaper
+from src.pipeline.pca import My_PCA
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 

@@ -12,7 +12,7 @@ for s in range(start_subject, end_subject + 1):
 	# Iterate through each recording for the current subject
 	for r in recordings:
 		# Construct the file path
-		file_path = f'"../data/{subject_str}/{subject_str}R{r}.edf",'
+		file_path = f'"../../data/{subject_str}/{subject_str}R{r}.edf",'
 		# Append the formatted file path to the list
 		file_paths.append(f'\t{file_path}')
 

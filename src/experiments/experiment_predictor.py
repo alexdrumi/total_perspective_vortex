@@ -1,13 +1,13 @@
-from pipeline_builder import PipelineBuilder
-from grid_search_manager import GridSearchManager
-from pipeline_executor import PipelineExecutor
-from command_line_parser import CommandLineParser
-from feature_extractor import FeatureExtractor
-from mlflow_manager import MlflowManager
-from dataset_preprocessor import Preprocessor
-from epoch_extractor import EpochExtractor
-from eeg_plotter import EEGPlotter
-from epoch_concatenator import EpochConcatenator
+from src.pipeline.pipeline_builder import PipelineBuilder
+from src.experiments.grid_search_manager import GridSearchManager
+from src.pipeline.pipeline_executor import PipelineExecutor
+from src.utils.command_line_parser import CommandLineParser
+from src.pipeline.feature_extractor import FeatureExtractor
+from src.mlflow_integration.mlflow_manager import MlflowManager
+from src.data_extraction.dataset_preprocessor import Preprocessor
+from src.data_extraction.epoch_extractor import EpochExtractor
+from src.utils.eeg_plotter import EEGPlotter
+from src.data_extraction.epoch_concatenator import EpochConcatenator
 
 import numpy as np
 import mne
@@ -25,27 +25,27 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold
 from sklearn.model_selection import KFold
 
-from dataset_preprocessor import Preprocessor
-from feature_extractor import FeatureExtractor
-from eeg_plotter import EEGPlotter
+from src.data_extraction.dataset_preprocessor import Preprocessor
+from src.pipeline.feature_extractor import FeatureExtractor
+from src.utils.eeg_plotter import EEGPlotter
 
 import joblib
 import logging
 
-from pca import My_PCA
-from epoch_extractor import EpochExtractor
+from src.pipeline.pca import My_PCA
+from src.data_extraction.epoch_extractor import EpochExtractor
 
 import time
 
-from custom_scaler import CustomScaler
-from reshaper import Reshaper
+from src.pipeline.custom_scaler import CustomScaler
+from src.pipeline.reshaper import Reshaper
 
-from command_line_parser import CommandLineParser
+from src.utils.command_line_parser import CommandLineParser
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
-file_handler = logging.FileHandler('../logs/error_log.log', mode='w')
+file_handler = logging.FileHandler('../../logs/error_log.log', mode='w')
 file_handler.setLevel(logging.ERROR)
 
 stream_handler = logging.StreamHandler(sys.stdout)
