@@ -42,16 +42,16 @@ class MyApp:
 		for group in run_groups:
 			groups_runs = group['runs']
 			group_key = f"runs_{'_'.join(map(str, groups_runs))}"
-			model_path = f"../models/pipe_{group_key}.joblib"
+			model_path = f"../../models/pipe_{group_key}.joblib"
 
 			run_keys = [k for k in epochs_dict.keys() if int(k[-2:]) in groups_runs]
 			if not run_keys:
 				continue
-
+			
 			pipeline = predictor.load_model(model_path)
 			if pipeline is None:
 				continue
-
+			
 			# Evaluate on first run_key for simplicity
 			# (Or you could iterate over all run_keys)
 			run_key = run_keys[0]
@@ -67,7 +67,7 @@ class MyApp:
 
 		# Print final results
 		if total_mean_accuracy_events:
-			print(f"\033Mean accuracy of event-based experiments: {np.mean(total_mean_accuracy_events):.3f}\033[0m")
+			print(f"\033 Mean accuracy of event-based experiments: {np.mean(total_mean_accuracy_events):.3f}\033[0m")
 			time.sleep(1)
 		else:
 			print("No event-based experiments processed.")

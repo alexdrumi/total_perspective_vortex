@@ -116,6 +116,7 @@ class ExperimentPredictor:
 		"""
 		feature_extraction_method = 'baseline' if (group['runs'][0] in [1, 2]) else 'events'
 		
+		print(f'WE ARE IN THE EXPERIMENT PREDICTOR NOW')
 		# Extract features
 		test_extracted_features = self.feature_extractor.extract_features(
 			epochs_predict[run_key], feature_extraction_method
