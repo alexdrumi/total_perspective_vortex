@@ -13,7 +13,7 @@ from src.data_extraction.epoch_concatenator import EpochConcatenator
 import time
 import numpy as np
 
-class MyApp:
+class PredictOrchestrator:
 	"""
 	The main orchestrator: parses CLI args, runs the entire experiment.
 	"""

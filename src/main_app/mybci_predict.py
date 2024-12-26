@@ -25,7 +25,7 @@ import os
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.append(src_path)
 
-from myapp import MyApp
+from myapp import PredictOrchestrator
 from src.pipeline.custom_scaler import CustomScaler
 from src.pipeline.reshaper import Reshaper
 from src.utils.command_line_parser import CommandLineParser
@@ -492,7 +492,7 @@ predict = [
 def main():
 	try:
 		predict_data_path = predict
-		app = MyApp()
+		app = PredictOrchestrator()
 		app.run(predict_data_path)
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")
