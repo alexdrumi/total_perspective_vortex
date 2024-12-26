@@ -1404,7 +1404,7 @@ class ExperimentTrainerFacade:
 			self.mlflow_manager.start_mlflow_server()
 
 		#load data
-		raw_data = self.data_preprocessor.load_raw_data(train)
+		raw_data = self.data_preprocessor.load_raw_data('../../configs/train_data.yaml')
 		filtered_data = self.data_preprocessor.filter_raw_data(raw_data) #this returns a triplet now
 
 		#extract epochs and associated labels

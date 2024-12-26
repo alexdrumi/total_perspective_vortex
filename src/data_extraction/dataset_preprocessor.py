@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Tuple
 import mne
 import os
-
+import yaml
 
 '''
 TODO: 
@@ -17,7 +17,6 @@ class Preprocessor:
 	def __init__(self):
 		self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 		# self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
-
 		self.raw_data = []
 		self.experiments_list = [
 			{
@@ -72,9 +71,13 @@ class Preprocessor:
 			'5': [],
 			'6': []
 		}
-	
-		for file_path in data_path:
+
+		with open(data_path, 'r') as f:
+			yaml_data_path = yaml.safe_load(f)
+
+		for file_path in yaml_data_path['data_paths']:
 			file_path = Path(file_path) 
+			print(file_path)
 			if not file_path.exists():
 				raise FileNotFoundError(f"Data path/file '{file_path}' does not exist.")
 			try:
@@ -96,6 +99,8 @@ class Preprocessor:
 
 				raw = mne.io.read_raw_edf(file_path, include=self.data_channels)
 
+				if (raw.info['sfreq'] != 160.0): #all the raw frequencies should be 160.0 but there are some faulty ones, those we ignore
+					continue 
 				if run_nr == 1:
 					concatted_raw_data_dict['1'].append(raw)
 				if run_nr == 2:

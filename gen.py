@@ -1,7 +1,8 @@
 # Define the range of subjects and recordings
 start_subject = 1
 end_subject = 109
-recordings = ["04", "08", "12"]
+#recordings = ["06", "10", "14"]
+recordings = ["01", "02"]
 
 # Initialize a list to store the file paths
 file_paths = []

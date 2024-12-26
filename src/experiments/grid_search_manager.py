@@ -20,7 +20,7 @@ class GridSearchManager():
 			}
 
 
-
+	#this could be an external function as well, using it in dataset preprocessor
 	def load_config(self):
 		with open('../../configs/grid_search_parameters.yaml', 'r') as f:
 			config = yaml.safe_load(f)
