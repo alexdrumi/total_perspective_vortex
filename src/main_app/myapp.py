@@ -35,7 +35,7 @@ class PredictOrchestrator:
 
 		predictor = ExperimentPredictor(plot_eeg=plot_eeg)
 
-		# Load and preprocess data
+		#load and preprocess data
 		epochs_dict, labels_dict, run_groups = predictor.load_and_filter_data(predict)
 
 		total_mean_accuracy_events = []
@@ -52,22 +52,20 @@ class PredictOrchestrator:
 			if pipeline is None:
 				continue
 			
-			# Evaluate on first run_key for simplicity
-			# (Or you could iterate over all run_keys)
 			run_key = run_keys[0]
 			accuracy, crossval_mean = predictor.evaluate_experiment(
 				epochs_dict, labels_dict, pipeline, group, run_key, chunk_size=7
 			)
-			print(f"\033 accuracy {accuracy}, crossval_mean {crossval_mean}\033[0m")
-			time.sleep(5)
+			print(f"\033[1;32mAccuracy of current experiment {run_key} is: {accuracy}\nCross-validation with Kfold mean is: {crossval_mean}\033[0m")
+			time.sleep(2)
 
-			# If events
-			if group['runs'][0] not in [1, 2]:
+			#if events are not baseline
+			if group['runs'][0] not in [1, 2]: #this would be with all 6 experiments, but just a better outcome in any case.
 				total_mean_accuracy_events.append(accuracy)
 
 		# Print final results
 		if total_mean_accuracy_events:
-			print(f"\033 Mean accuracy of event-based experiments: {np.mean(total_mean_accuracy_events):.3f}\033[0m")
+			print(f"\033[1;32mMean accuracy of event-based experiments: {np.mean(total_mean_accuracy_events):.3f}\033[0m")
 			time.sleep(1)
 		else:
 			print("No event-based experiments processed.")
