@@ -59,9 +59,10 @@ class FeatureExtractor():
 				analysis[key]['tmin'] = 0
 				analysis[key]['tmax'] = 0.793
 
-
+		# print(f'{run_type} IS THE RUNTYPE\n')
 		feature_matrices = []
 		for analysis_name, params in analysis.items():
+			print(f'{params['tmin']} tmin, {params['tmax']} is tmax\n\n')
 			cropped_epochs = extracted_epochs_dict.copy().crop(tmin=params['tmin'], tmax=params['tmax'])
 			print(f"  - Cropped epochs for analysis '{analysis_name}': {params['tmin']} to {params['tmax']} seconds.")
 

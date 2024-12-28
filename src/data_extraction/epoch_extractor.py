@@ -52,18 +52,20 @@ class EpochExtractor:
 		print(f'{event_id} are event ids')
 		sfreq = data.info["sfreq"]
 		# event_times = events[:, 0] / sfreq
-		# print(event_times)
+		# print(f' IS {event_times} EVENT_TIMES ')
 		# tmin, tmax = 0
+		# print(f' IS {len(event_id)} is eventid len ')
+
 
 		#WE COULD MAKE THIS PRETTIER with a dict or so!!!!!!!!
-		if (len(event_id) == 1): #single event, baseline open or closed eyes
+		if (len(event_id) < 3): #single event until experiment 89, then 2 events, baseline open or closed eyes
 			t_min = 0
 			t_max = 0.793
 		else:
 			event_id = {"T1": 1, "T2": 2} #this is fine in general
 			t_min = -2
 			t_max= 5.1
-		print(f'{t_min}: tmin, {t_max}: tmax')
+		# print(f'{t_min}: tmin, {t_max}: tmax')
 		epochs = mne.Epochs(data, events, event_id=event_id, tmin=t_min, tmax=t_max,
 							baseline=None, preload=True)
 		
@@ -81,11 +83,11 @@ class EpochExtractor:
 			for key, raw_data in filtered_eeg_data.items():
 				if raw_data is not None:
 					current_epochs, _ = self.extract_epochs(raw_data)
-					print(f'{_} is sfreq')
+					# print(f'{_} is sfreq')
 					epochs_for_multiple_files[key] = current_epochs 
 
 					current_labels = current_epochs.events[:, 2] - 1
-					print(f"current labels are {current_labels}")
+					# print(f"current labels are {current_labels}")
 					labels_for_multiple_files[key] = current_labels
 
 			return epochs_for_multiple_files, labels_for_multiple_files

@@ -1,4 +1,41 @@
 data_paths:
+
+# run 1, eyes open
+- ../../data/S001/S001R01.edf
+- ../../data/S002/S002R01.edf
+- ../../data/S003/S003R01.edf
+- ../../data/S004/S004R01.edf
+- ../../data/S005/S005R01.edf
+- ../../data/S006/S006R01.edf
+- ../../data/S007/S007R01.edf
+- ../../data/S008/S008R01.edf
+- ../../data/S009/S009R01.edf
+- ../../data/S010/S010R01.edf
+- ../../data/S011/S011R01.edf
+- ../../data/S012/S012R01.edf
+- ../../data/S013/S013R01.edf
+- ../../data/S014/S014R01.edf 
+
+
+#run 2, eyes closed
+- ../../data/S001/S001R02.edf
+- ../../data/S002/S002R02.edf
+- ../../data/S003/S003R02.edf
+- ../../data/S004/S004R02.edf
+- ../../data/S005/S005R02.edf
+- ../../data/S006/S006R02.edf
+- ../../data/S007/S007R02.edf
+- ../../data/S008/S008R02.edf
+- ../../data/S009/S009R02.edf
+- ../../data/S010/S010R02.edf
+- ../../data/S011/S011R02.edf
+- ../../data/S012/S012R02.edf
+- ../../data/S013/S013R02.edf
+- ../../data/S014/S014R02.edf 
+
+
+
+#run 3,8,11
 - ../../data/S001/S001R03.edf
 - ../../data/S005/S005R11.edf
 - ../../data/S006/S006R03.edf
@@ -61,36 +98,8 @@ data_paths:
 - ../../data/S025/S025R03.edf
 - ../../data/S025/S025R07.edf
 - ../../data/S025/S025R11.edf 
-# run 1, eyes open
-- ../../data/S001/S001R01.edf
-- ../../data/S002/S002R01.edf
-- ../../data/S003/S003R01.edf
-- ../../data/S004/S004R01.edf
-- ../../data/S005/S005R01.edf
-- ../../data/S006/S006R01.edf
-- ../../data/S007/S007R01.edf
-- ../../data/S008/S008R01.edf
-- ../../data/S009/S009R01.edf
-- ../../data/S010/S010R01.edf
-- ../../data/S011/S011R01.edf
-- ../../data/S012/S012R01.edf
-- ../../data/S013/S013R01.edf
-- ../../data/S014/S014R01.edf 
-# un 2, eyes closed
-- ../../data/S001/S001R02.edf
-- ../../data/S002/S002R02.edf
-- ../../data/S003/S003R02.edf
-- ../../data/S004/S004R02.edf
-- ../../data/S005/S005R02.edf
-- ../../data/S006/S006R02.edf
-- ../../data/S007/S007R02.edf
-- ../../data/S008/S008R02.edf
-- ../../data/S009/S009R02.edf
-- ../../data/S010/S010R02.edf
-- ../../data/S011/S011R02.edf
-- ../../data/S012/S012R02.edf
-- ../../data/S013/S013R02.edf
-- ../../data/S014/S014R02.edf 
+
+
 # #run 4,8,12
 - ../../data/S001/S001R04.edf
 - ../../data/S001/S001R08.edf
@@ -167,6 +176,8 @@ data_paths:
 - ../../data/S025/S025R04.edf
 - ../../data/S025/S025R08.edf
 - ../../data/S025/S025R12.edf 
+
+
  #5,9,13 all subject, 3 runs
 - ../../data/S001/S001R05.edf
 - ../../data/S001/S001R09.edf
@@ -242,6 +253,10 @@ data_paths:
 - ../../data/S024/S024R13.edf
 - ../../data/S025/S025R05.edf
 - ../../data/S025/S025R09.edf 
+- ../../data/S025/S025R13.edf 
+
+
+
  #6,10,14
 - ../../data/S001/S001R06.edf
 - ../../data/S001/S001R10.edf
