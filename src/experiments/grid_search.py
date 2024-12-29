@@ -22,7 +22,7 @@ class GridSearchManager():
 
 	#this could be an external function as well, using it in dataset preprocessor
 	def load_config(self):
-		with open('../../configs/grid_search_parameters.yaml', 'r') as f:
+		with open('../../config/grid_search_parameters.yaml', 'r') as f:
 			config = yaml.safe_load(f)
 		return config
 
@@ -71,5 +71,4 @@ class GridSearchManager():
 		grid_search.fit(X_train, y_train)
 
 		best_params, best_score, best_pipeline = self.get_grid_search_results(grid_search)
-		
 		return best_params, best_score, best_pipeline

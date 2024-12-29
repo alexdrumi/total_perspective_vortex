@@ -1,46 +1,25 @@
 from src.pipeline.pipeline_builder import PipelineBuilder
-from src.experiments.grid_search_manager import GridSearchManager
+from src.experiments.grid_search import GridSearchManager
 from src.pipeline.pipeline_executor import PipelineExecutor
 from src.utils.command_line_parser import CommandLineParser
 from src.pipeline.feature_extractor import FeatureExtractor
 from src.mlflow_integration.mlflow_manager import MlflowManager
-from src.data_extraction.dataset_preprocessor import Preprocessor
-from src.data_extraction.epoch_extractor import EpochExtractor
+from src.data_processing.preprocessor import Preprocessor
+from src.data_processing.extract_epochs import EpochExtractor
 from src.utils.eeg_plotter import EEGPlotter
-from src.data_extraction.epoch_concatenator import EpochConcatenator
+from src.data_processing.concatenate_epochs import EpochConcatenator
 
 import numpy as np
-import mne
 import sys
 import matplotlib.pyplot as plt
-
-from sklearn.preprocessing import StandardScaler, FunctionTransformer
-from sklearn.decomposition import PCA
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold
-from sklearn.model_selection import KFold
-
-from src.data_extraction.dataset_preprocessor import Preprocessor
-from src.pipeline.feature_extractor import FeatureExtractor
-from src.utils.eeg_plotter import EEGPlotter
-
 import joblib
 import logging
-
-from src.pipeline.pca import My_PCA
-from src.data_extraction.epoch_extractor import EpochExtractor
-
 import time
 
-from src.pipeline.custom_scaler import CustomScaler
-from src.pipeline.reshaper import Reshaper
+from sklearn.model_selection import  cross_val_score, KFold
+from sklearn.model_selection import KFold
 
-from src.utils.command_line_parser import CommandLineParser
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
@@ -69,9 +48,11 @@ class ExperimentPredictor:
 	def __init__(self, plot_eeg=False):
 		self.plot_eeg = plot_eeg
 		self.data_preprocessor = Preprocessor()
-		self.epoch_extractor = EpochExtractor()
+		self.extract_epochs = EpochExtractor()
 		self.feature_extractor = FeatureExtractor()
 		self.eeg_plotter = EEGPlotter(epoch_duration=7.1)
+
+
 
 	def load_and_filter_data(self, predict):
 		"""
@@ -82,9 +63,11 @@ class ExperimentPredictor:
 		logging.info("Filtering raw data...")
 		filtered_data = self.data_preprocessor.filter_raw_data(loaded_raw_data)
 		logging.info("Extracting epochs and labels...")
-		epochs_dict, labels_dict = self.epoch_extractor.extract_epochs_and_labels(filtered_data)
-		run_groups = self.epoch_extractor.experiments_list
+		epochs_dict, labels_dict = self.extract_epochs.extract_epochs_and_labels(filtered_data)
+		run_groups = self.extract_epochs.experiments_list
 		return epochs_dict, labels_dict, run_groups
+
+
 
 	def load_model(self, model_path):
 		"""
@@ -98,6 +81,8 @@ class ExperimentPredictor:
 			logging.warning(f'Pipeline file not found at {model_path}.')
 			return None
 
+
+
 	def predict_chunk(self, pipeline, test_features):
 		"""
 		Runs inference on a chunk of features using a trained pipeline.
@@ -107,7 +92,10 @@ class ExperimentPredictor:
 		end_time = time.time()
 		inference_time = end_time - start_time
 		logging.debug(f"Prediction time for current chunk: {inference_time:.4f} seconds")
+		print(f'Prediction time for current chunk is: {inference_time:.4f} seconds')
 		return predictions, inference_time
+
+
 
 	def evaluate_experiment(self, epochs_predict, labels_predict, pipeline, group, run_key, chunk_size=7):
 		"""
@@ -145,7 +133,8 @@ class ExperimentPredictor:
 			current_accuracy = correct_predictions / len(current_labels)
 			logging.info(f"Chunk {chunk_idx}: Accuracy={current_accuracy:.2f}, Inference time={inference_time:.3f}s")
 
-			if self.plot_eeg:
+			# print(f'{chunk_idx} is chunk idx, {total_chunks} is total_chunks')
+			if self.plot_eeg and total_chunks - 4 == chunk_idx: #print one before the last chunk
 				label_names = group['mapping']
 				self.eeg_plotter.plot_eeg_epochs_chunk(
 					current_batch_idx=chunk_idx,

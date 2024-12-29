@@ -29,10 +29,10 @@ from myapp import PredictOrchestrator
 from src.pipeline.custom_scaler import CustomScaler
 from src.pipeline.reshaper import Reshaper
 from src.utils.command_line_parser import CommandLineParser
-from src.data_extraction.dataset_preprocessor import Preprocessor
+from src.data_processing.preprocessor import Preprocessor
 from src.pipeline.feature_extractor import FeatureExtractor
 from src.pipeline.pca import My_PCA
-from src.data_extraction.epoch_extractor import EpochExtractor
+from src.data_processing.extract_epochs import EpochExtractor
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
@@ -60,9 +60,10 @@ channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 
 def main():
 	try:
-		predict_data_path = '../../configs/predict_data.yaml'
+		predict_data_path = '../../config/predict_data.yaml'
 		app = PredictOrchestrator()
 		app.run(predict_data_path)
+
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")
 	except PermissionError as e:
@@ -71,8 +72,6 @@ def main():
 		logging.error(f"IO error: {e}")
 	except ValueError as e:
 		logging.error(f"Value error: {e}")
-
-
 
 if __name__ == "__main__":
 	main()

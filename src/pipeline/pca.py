@@ -3,7 +3,13 @@ import numpy as np
 
 
 class My_PCA(BaseEstimator, TransformerMixin):
-	def __init__(self, n_comps = 2):
+	def __init__(self, n_comps: int = 2) -> None:
+		"""
+		Creates the custom PCA class for dimensionality reduction.
+
+		Args:
+			n_comps (int): Number of principal components to retain.
+		"""
 		self.n_comps = n_comps
 		self.basis = None
 		self.current_centered_feature = None
@@ -11,6 +17,16 @@ class My_PCA(BaseEstimator, TransformerMixin):
 
 
 	def fit(self, x_features: np.ndarray, y=None) -> "My_PCA":
+		"""
+		Fits the PCA model to the given features.
+
+		Args:
+			x_features (np.ndarray): Input data of shape (n_samples, n_features).
+			y (None): ignore it, just placed here for compatibility.
+
+		Returns:
+			self: Fitted My_PCA object.
+		"""
 		self.mean_ = np.mean(x_features, axis=0)
 		self.mean_ = np.reshape(np.asarray(self.mean_), (-1,)) #consistent for 1d operations
 
@@ -52,6 +68,15 @@ class My_PCA(BaseEstimator, TransformerMixin):
 
 
 	def transform(self, x_features: np.ndarray) -> np.ndarray:
+		"""
+		Transform the data to the reduced dimensional space.
+
+		Args:
+			x_features (np.ndarray): Input data of shape (n_samples, n_features).
+
+		Returns:
+			np.ndarray: Transformed data of shape (n_samples, n_comps).
+		"""
 		X_transformed = x_features @ self.basis.T
 		X_transformed -= np.reshape(self.mean_, (1, -1)) @ self.basis.T
 		return X_transformed

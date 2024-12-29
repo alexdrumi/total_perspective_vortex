@@ -10,7 +10,6 @@ import time
 import yaml
 import os
 
-# Add the `src` directory to the system path
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.append(src_path)
 
@@ -33,14 +32,14 @@ import mlflow.sklearn
 from mlflow.models.signature import infer_signature
 
 from src.mlflow_integration.mlflow_manager import MlflowManager
-from src.data_extraction.dataset_preprocessor import Preprocessor
+from src.data_processing.preprocessor import Preprocessor
 from src.pipeline.feature_extractor import FeatureExtractor
 from src.pipeline.pca import My_PCA
-from src.data_extraction.epoch_extractor import EpochExtractor
+from src.data_processing.extract_epochs import EpochExtractor
 from src.pipeline.custom_scaler import CustomScaler
 from src.pipeline.reshaper import Reshaper
 from src.utils.command_line_parser import CommandLineParser
-
+from src.experiments.trainer import ExperimentTrainerFacade
 
 import subprocess
 
@@ -78,23 +77,23 @@ channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
             # "Fpz",
 
 
-from src.experiments.experiment_trainer import ExperimentTrainerFacade
 
 def main():
-	# try:
-	experiment_trainer = ExperimentTrainerFacade()
-	experiment_trainer.run_experiment()
+	try:
+		trainer = ExperimentTrainerFacade()
+		trainer.run_experiment()
 
-	# except FileNotFoundError as e:
-	# 	logging.error(f"File not found: {e}")
-	# except PermissionError as e:
-	# 	logging.error(f"Permission on the file denied: {e}")
-	# except IOError as e:
-	# 	logging.error(f"Error reading the data file: {e}")
-	# except ValueError as e:
-	# 	logging.error(f"Invalid EDF data: {e}")
-	# except TypeError as e:
-	# 		logging.error(f"{e}")
+	except FileNotFoundError as e:
+		logging.error(f"File not found: {e}")
+	except PermissionError as e:
+		logging.error(f"Permission on the file denied: {e}")
+	except IOError as e:
+		logging.error(f"Error reading the data file: {e}")
+	except ValueError as e:
+		logging.error(f"Invalid EDF data: {e}")
+	except TypeError as e:
+			logging.error(f"{e}")
+
 
 if __name__ == '__main__':
 	main()

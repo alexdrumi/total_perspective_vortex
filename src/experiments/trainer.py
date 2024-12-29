@@ -1,105 +1,12 @@
-#!/usr/bin/python
-import numpy as np
-import mne
-import sys
-import matplotlib.pyplot as plt
-import joblib
-import logging
-from pathlib import Path
-import time
-import yaml
 
-
-from sklearn.preprocessing import StandardScaler, FunctionTransformer
-from sklearn.decomposition import PCA
-from mne.decoding import CSP
-
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.svm import SVC
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold, GridSearchCV
-
-import mlflow
-import mlflow.sklearn
-from mlflow.models.signature import infer_signature
-from mlflow_manager import MlflowManager
-
-from dataset_preprocessor import Preprocessor
-from feature_extractor import FeatureExtractor
-from pca import My_PCA
-from epoch_extractor import EpochExtractor
-from custom_scaler import CustomScaler
-from reshaper import Reshaper
-
-from command_line_parser import CommandLineParser
-import subprocess
-
-#logger config
-#logging for both file and console
-logger = logging.getLogger()
-logger.setLevel(logging.ERROR)
-
-#file handler - Logs to a file
-file_handler = logging.FileHandler('../logs/error_log.log', mode='w')
-file_handler.setLevel(logging.ERROR)
-
-#stream handler - Logs to terminal (console)
-stream_handler = logging.StreamHandler(sys.stdout)
-stream_handler.setLevel(logging.ERROR)
-
-#formatfor log messages
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-stream_handler.setFormatter(formatter)
-
-#handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
-
-mne.set_log_level(verbose='WARNING')
-
-channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
-
-
-
-
-# channels = ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
-            # "CP3",
-            # "CP1",
-            # "CPz",
-            # "CP2",
-            # "CP4",
-            # "Fpz",
-# predict = [
-# "data/S018/S018R11.edf",
-# "data/S042/S042R07.edf",
-# "data/S042/S042R03.edf",
-# "data/S104/S104R11.edf",
-# # "data/S104/S104R07.edf",
-# # "data/S090/S090R11.edf",
-# # "data/S086/S086R11.edf",
-# # "data/S086/S086R03.edf",
-# # "data/S086/S086R07.edf",
-# # "data/S017/S017R11.edf",
-# # "data/S017/S017R07.edf",
-# # "data/S017/S017R03.edf",
-# # "data/S013/S013R07.edf",
-# # "data/S013/S013R11.edf",
-# # "data/S013/S013R03.edf",
-# # "data/S055/S055R11.edf",
-# # "data/S055/S055R07.edf",
-# # "data/S055/S055R03.edf",
-# # "data/S016/S016R03.edf",
-# # "data/S016/S016R07.edf",
-# # "data/S016/S016R11.edf",
-# #"/data/S103/S103R11.edf",
-# ]
-
+from src.pipeline.pipeline_builder import PipelineBuilder
+from src.experiments.grid_search import GridSearchManager
+from src.pipeline.pipeline_executor import PipelineExecutor
+from src.utils.command_line_parser import CommandLineParser
+from src.pipeline.feature_extractor import FeatureExtractor
+from src.mlflow_integration.mlflow_manager import MlflowManager
+from src.data_processing.preprocessor import Preprocessor
+from src.data_processing.extract_epochs import EpochExtractor
 train = [
 
 	#run 3,7,11
@@ -1465,308 +1372,84 @@ train = [
 		# "../../data/S090/S090R07.edf",
 ]
 
-# ica = mne.preprocessing.ICA(method="infomax")
-#--------------------------------------------------------------------------------------------------------------------------
 
 
-# def initate_mlflow_environment():
-# 	subprocess.Popen(["mlflow", "ui"])
-# 	mlflow.set_tracking_uri("http://localhost:5000")  #uri
-# 	print('mlfow is running on http://localhost:5000", here you can follow the model metrics.')
-# 	time.sleep(2)
-
-
-
-# def create_grid_search_parameters():
-# 	with open('../configs/grid_search_parameters.yaml', 'r') as f:
-# 		config = yaml.safe_load(f)
-
-# 	classifier_mapping = {
-# 			'MLPClassifier': MLPClassifier(max_iter=10000,early_stopping=True,n_iter_no_change=50,verbose=False),
-# 			'SVC': SVC(),
-# 			'RandomForestClassifier': RandomForestClassifier(),
-# 			'LogisticRegression': LogisticRegression(),
-# 			'DecisionTreeClassifier': DecisionTreeClassifier()
-# 		}
-
-# 	grid_search_params = []
-# 	for param_set in config['grid_search_params']:
-# 		classifier_name = param_set['classifier']
-# 		if classifier_name in classifier_mapping:
-# 			param_set['classifier'] = [classifier_mapping[classifier_name]] 
-# 			print(f'{param_set} is gonna be the paramset now')
-# 			grid_search_params.append(param_set)
-
-# 	return grid_search_params
-
-
-from experiment_trainer import ExperimentTrainerFacade
-
-def main():
-	# try:
-	experiment_trainer = ExperimentTrainerFacade()
-	experiment_trainer.run_experiment()
-	
-
-
-	# except FileNotFoundError as e:
-	# 	logging.error(f"File not found: {e}")
-	# except PermissionError as e:
-	# 	logging.error(f"Permission on the file denied: {e}")
-	# except IOError as e:
-	# 	logging.error(f"Error reading the data file: {e}")
-	# except ValueError as e:
-	# 	logging.error(f"Invalid EDF data: {e}")
-	# except TypeError as e:
-	# 		logging.error(f"{e}")
-
-if __name__ == '__main__':
-	main()
-
-
-
-
-
-'''
-def main():
-	try:
-		dataset_preprocessor_instance = Preprocessor()
-		loaded_raw_data = dataset_preprocessor_instance.load_raw_data(data_path=train) #RETURN DOESNT WORK, IT RETURNS AFTER 1 FILE
-		# print(dataset_preprocessor_instance.raw_data)
-		print(type(loaded_raw_data))
-		filtered_data = dataset_preprocessor_instance.filter_raw_data(loaded_raw_data) #this returns a triplet now
-		print(filtered_data) #this is a dict now
-		# print(loaded_raw_data)
-		# sys.exit(1)
-		# for data in filtered_data:
-		# 	print(data[0], data[1], data[2])
-		# sys.exit(1)
-		# print(experiment)
-		epoch_extractor_instance = EpochExtractor()
-		epochs, labels = epoch_extractor_instance.extract_epochs_and_labels(filtered_data)
-
-		# print(labels)
-		# print(epochs)
-		# sys.exit(1)
-
-		# for idx, epoch in enumerate(epochs):
-		# 	print(epoch)
-		# 	print(labels[idx])
-
-		feature_extractor_instance = FeatureExtractor()
-		trained_extracted_features = feature_extractor_instance.extract_features(epochs) #callable
-		# trained_extracted_features = trained_extracted_features['3']
-
-		
-
-		# print(f'{trained_extracted_features}')
-		print(f'{type(trained_extracted_features)} is the feature type, {type(labels)} is the typeoflabels')
-		# print(type(trained_extracted_features))
-
-		# sys.exit(1)
-
-		#https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html
-		custom_scaler = CustomScaler()
-		reshaper = Reshaper()
-		my_pca = My_PCA(n_comps=100)
-		mlp_classifier = MLPClassifier(hidden_layer_sizes=(20,10),
-									max_iter=16000,
-									random_state=42
+#create a facade which has all the subsystems
+class ExperimentTrainerFacade:
+	def __init__(self, config_path='../config/grid_search_parameters.yaml', mlflow_enabled=False):
+		self.command_line_parser = CommandLineParser( #we can make this more elegant with passing another config?
+			[{
+					'name': '--mlflow',
+					'type': str,
+					'default': 'false',
+					'choices': ['true', 'false'],
+					'help':'Enable (True) or disable (False) the mlflow server for tracking model analysis. Default is False.\n'
+			}]
 		)
-		# sys.exit(1)
+		self.mlflow_manager = MlflowManager()
+		self.data_preprocessor = Preprocessor()
+		self.extract_epochs = EpochExtractor()
+		self.feature_extractor = FeatureExtractor()
+		self.pipeline_executor = PipelineExecutor()
+		self.pipeline_builder = PipelineBuilder(n_components=40)
+		self.grid_search = GridSearchManager()
+		self.mlflow_enabled = mlflow_enabled
 
-	#for customscaler 3d shape check
+
 	
+	def run_experiment(self):
+		#start mlflow if argument was given
+		self.mlflow_enabled = self.command_line_parser.parse_arguments()
+		if (self.mlflow_enabled == True):
+			self.mlflow_manager.start_mlflow_server()
 
-	# for key_nr in range(1,4):
+		#load data
+		raw_data = self.data_preprocessor.load_raw_data('../../config/train_data.yaml')
+		filtered_data = self.data_preprocessor.filter_raw_data(raw_data) #this returns a triplet now
 
+		#extract epochs and associated labels
+		epochs_dict, labels_dict = self.extract_epochs.extract_epochs_and_labels(filtered_data)
+		run_groups = self.extract_epochs.experiments_list
 
-		pipeline = Pipeline([
-			('scaler', custom_scaler),
-			('reshaper', reshaper),
-			('pca', my_pca),
-			('classifier', mlp_classifier) #mlp will be replaced in grid search
-		])
-		print(f"{labels['4'].shape}")
-		pipeline.fit(trained_extracted_features, labels['4'])
-
-		sys.exit(1)
-
-	# #------------------------------------------------------------------------------------------------------------
-
-	# predict_raw = dataset_preprocessor_instance.load_raw_data(data_path=predict)
-	# predict_filtered = dataset_preprocessor_instance.filter_raw_data()
-	# epochs_predict, labels_predict = epoch_extractor_instance.extract_epochs_and_labels(predict_filtered)
-
-	# test_extracted_features = feature_extractor_instance.extract_features(epochs_predict) #callable
+		#run the experiments on different groups
+		self.process_run_groups(run_groups, epochs_dict, labels_dict, self.mlflow_enabled)
 
 
-		shuffle_split_validation = ShuffleSplit(n_splits=5, test_size=0.3, random_state=0)
 
-		# # scoring = ['accuracy', 'precision', 'f1_micro'] this only works for: scores = cross_validate(pipeline_custom, x_train, y_train, scoring=scoring, cv=k_fold_cross_val)
-		# # scores = cross_val_score(pipeline_custom, x_train, y_train, scoring='accuracy', cv=shuffle_split_validation)
-		scores = cross_val_score(
-			pipeline, trained_extracted_features, 
-			labels['4'],  
-			scoring='accuracy', 
-			cv=shuffle_split_validation
-		)
-		
-		print(scores)
-		# print(f'Average accuracy: {scores.mean()}')
+	def process_run_groups(self, run_groups, epochs_dict, labels_dict, mlflow_enabled):
+		for groups in run_groups:
+			groups_runs = groups['runs']
+			group_key = f'runs_{"_".join(map(str, groups_runs))}'
+			print(f"\nProcessing group: {group_key} with runs {groups_runs[0]}")
 
+			run_keys = [run_key for run_key in epochs_dict.keys() if int(run_key[-2:]) in groups_runs]
+			available_runs = [run_key for run_key in run_keys if run_key in epochs_dict]
 
-		# sys.exit(1)
-
-		grid_search_params = [
-			#MLP
-			{
-				'classifier': [MLPClassifier(
-					max_iter=16000,
-					early_stopping=True,
-					n_iter_no_change=100, #if it doesnt improve for 10 epochs
-					verbose=True)],
-				'pca__n_comps': [20,30,42,50],
-				#hidden layers of multilayer perceptron class
-				'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 50)],
-				#relu->helps mitigate vanishing gradients, faster convergence
-				#tanh->hyperbolic tangent, outputs centered around zero
-				'classifier__activation': ['relu', 'tanh'],
-				#adam, efficient for large datasets, adapts learning rates
-				#stochastic gradient, generalize better, slower convergence
-				'classifier__solver': ['adam', 'sgd'],
-				'classifier__learning_rate_init': [0.001, 0.01, 0.1]
-
-			},
-			#SVC
-			{
-				'classifier': [SVC()],
-				'pca__n_comps': [20, 30, 42, 50],
-				'classifier__C': [0.1, 1, 10],
-				'classifier__kernel': ['linear', 'rbf']
-			},
+			if not available_runs:
+				print(f"No available runs for group '{group_key}', skipping.")
+				continue
 			
-			# RANDOM FOREST
-			{
-				'classifier': [RandomForestClassifier()],
-				'pca__n_comps': [20,30,42,50],
-				'classifier__n_estimators': [50, 100, 200],
-				'classifier__max_depth': [None, 10, 20]
-			},
-			#DECISION TREE
-			{
-				'pca__n_comps': [20, 30, 42, 50],
-				'classifier': [DecisionTreeClassifier()],
-				'classifier__max_depth': [None, 10, 20],
-				'classifier__min_samples_split': [2, 5, 10]
-			},
-			# Logistic Regression
-			{
-				'classifier': [LogisticRegression()],
-				'pca__n_comps': [20, 30, 42, 50],
-				'classifier__C': [0.1, 1, 10],
-				'classifier__penalty': ['l1', 'l2'],
-				'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
-				'classifier__multi_class': ['auto'],
-				'classifier__max_iter': [1000, 5000]
-			}
-		]
+			feature_extraction_method = 'baseline' if groups_runs[0] in [1,2] else 'events'
+			
+			#feature extraction
+			X_train = self.feature_extractor.extract_features(epochs_dict[run_keys[0]], feature_extraction_method) #trained_extracted_features, for now groups runs[0] is ok but at 13 etc it wont be
+			y_train = labels_dict[run_keys[0]]
+			
+			#build a pipeline
+			pipeline = self.pipeline_builder.build_pipeline()
 
-		from sklearn.model_selection import GridSearchCV
-
-		grid_search = GridSearchCV(
-			estimator=pipeline,
-			param_grid=grid_search_params,
-			cv=9,  #9fold cross-val
-			scoring='accuracy',  #evalmetric
-			n_jobs=-1,  #util all all available cpu cores
-			verbose=2,  # For detailed output
-			refit=True #this fits it automatically to the best estimator, just to emphasize here, its True by default
-		)
-
-		#just to use standard variables
-		X_train = trained_extracted_features
-		y_train = labels['3']
-		grid_search.fit(X_train, y_train)
-
-		print("Best Parameters:")
-		print(grid_search.best_params_)
-		print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.2f}")
+			#run the grid search
+			best_params, best_score, best_pipeline = self.grid_search.run_grid_search(pipeline, X_train, y_train)
+			
+			if self.mlflow_enabled == True:
+				#log metrics to mlflow
+				with self.mlflow_manager.start_run(run_name=group_key):
+					#we could use the pipeline executor as an external function to save pipeline metrics?
+					self.mlflow_manager.log_mlflow_experiment(group_key, best_params, best_score, best_pipeline, X_train, y_train) #this also dumps model
+			else:
+				#save model
+				self.pipeline_executor.save_model(best_pipeline, group_key)
+				#print cross val scores
+				self.pipeline_executor.evaluate_pipeline(group_key, best_pipeline, X_train, y_train)
 
 
-		best_pipeline = grid_search.best_estimator_
-		joblib.dump(best_pipeline, '../models/pipe.joblib')
-
-
-	except FileNotFoundError as e:
-		logging.error(f"File not found: {e}")
-	except PermissionError as e:
-		logging.error(f"Permission on the file denied: {e}")
-	except IOError as e:
-		logging.error(f"Error reading the data file: {e}")
-	except ValueError as e:
-		logging.error(f"Invalid EDF data: {e}")
-	except TypeError as e:
-			logging.error(f"{e}")
-
-if __name__ == '__main__':
-	main()
-'''
-
-
-
-
-#2024.12.20
-# grid_search_params = [
-# 	#MLP
-# 	{
-# 		'classifier': [MLPClassifier(
-# 			max_iter=10000,
-# 			early_stopping=True,
-# 			n_iter_no_change=50, #if it doesnt improve for 10 epochs
-# 			verbose=False)],
-# 		'pca__n_comps': [20,42,50],
-# 		#hidden layers of multilayer perceptron class
-# 		'classifier__hidden_layer_sizes': [(20, 10), (50, 20), (100, 30)],
-# 		#relu->helps mitigate vanishing gradients, faster convergence
-# 		#tanh->hyperbolic tangent, outputs centered around zero
-# 		'classifier__activation': ['relu', 'tanh'],
-# 		#adam, efficient for large datasets, adapts learning rates
-# 		#stochastic gradient, generalize better, slower convergence
-# 		'classifier__solver': ['adam', 'sgd'],
-# 		'classifier__learning_rate_init': [0.001, 0.01, 0.1]
-
-# 	},
-
-# 	# SVC
-# 	{
-# 		'classifier': [SVC()],
-# 		'pca__n_comps': [20, 42, 50],
-# 		'classifier__C': [0.1, 1, 8],
-# 		'classifier__kernel': ['linear', 'rbf']
-# 	},
-	
-# 	# RANDOM FOREST
-# 	{
-# 		'classifier': [RandomForestClassifier()],
-# 		'pca__n_comps': [20, 42],
-# 		'classifier__n_estimators': [50, 100, 200],
-# 		'classifier__max_depth': [None, 10, 20]
-# 	},
-# 	#DECISION TREE
-# 	{
-# 		'pca__n_comps': [20, 42],
-# 		'classifier': [DecisionTreeClassifier()],
-# 		'classifier__max_depth': [None, 10, 20],
-# 		'classifier__min_samples_split': [2, 5, 10]
-# 	},
-# 	# Logistic Regression
-# 	{
-# 		'classifier': [LogisticRegression()],
-# 		'pca__n_comps': [20, 42, 50],
-# 		'classifier__C': [0.1, 1, 10],
-# 		'classifier__penalty': ['l1', 'l2'],
-# 		'classifier__solver': ['liblinear'],  # 'liblinear' supports 'l1' penalty
-# 		'classifier__max_iter': [1000, 5000]
-# 	}
-# ]

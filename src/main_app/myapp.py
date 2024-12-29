@@ -1,17 +1,17 @@
 from src.pipeline.pipeline_builder import PipelineBuilder
-from src.experiments.grid_search_manager import GridSearchManager
+from src.experiments.grid_search import GridSearchManager
 from src.pipeline.pipeline_executor import PipelineExecutor
 from src.utils.command_line_parser import CommandLineParser
 from src.pipeline.feature_extractor import FeatureExtractor
 from src.mlflow_integration.mlflow_manager import MlflowManager
-from src.data_extraction.dataset_preprocessor import Preprocessor
-from src.data_extraction.epoch_extractor import EpochExtractor
-from src.experiments.experiment_predictor import ExperimentPredictor
+from src.data_processing.preprocessor import Preprocessor
+from src.data_processing.extract_epochs import EpochExtractor
+from src.experiments.predictor import ExperimentPredictor
 from src.utils.eeg_plotter import EEGPlotter
-from src.data_extraction.epoch_concatenator import EpochConcatenator
-
+from src.data_processing.concatenate_epochs import EpochConcatenator
 import time
 import numpy as np
+
 
 class PredictOrchestrator:
 	"""
