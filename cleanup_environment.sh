@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Get the directory where this script resides
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -6,12 +8,16 @@ VENV_DIR="${SCRIPT_DIR}/venv"
 MLFLOW_1_DIR="${SCRIPT_DIR}/src/main_app/mlartifacts"
 MLFLOW_2_DIR="${SCRIPT_DIR}/mlartifacts"
 MLFLOW_3_DIR="${SCRIPT_DIR}/src/main_app/mlruns"
-
 MLRUNS_DIR="${SCRIPT_DIR}/mlruns"
-
 PHYSIONET_DIR="${SCRIPT_DIR}/physionet.org"
 MODELS_DIR="${SCRIPT_DIR}/models"
 
+# Function to remove all __pycache__ directories recursively
+remove_pycache() {
+    echo "Searching for and removing all __pycache__ directories..."
+    find "$SCRIPT_DIR" -type d -name "__pycache__" -exec rm -rf {} +
+    echo "All __pycache__ directories removed."
+}
 
 # Function to deactivate and clean up
 cleanup() {
@@ -31,44 +37,23 @@ cleanup() {
         echo "Virtual environment directory not found at $VENV_DIR."
     fi
 
-    # Remove the MLFLOW directory
+    # Remove the MLFLOW directories
+    for dir in "$MLFLOW_1_DIR" "$MLFLOW_2_DIR" "$MLFLOW_3_DIR" "$MLRUNS_DIR"; do
+        if [ -d "$dir" ]; then
+            echo "Removing MLFLOW directory at $dir..."
+            rm -rf "$dir"
+        else
+            echo "MLFLOW directory not found at $dir."
+        fi
+    done
 
-    if [ -d "$MLFLOW_3_DIR" ]; then
-        echo "Removing MLFLOW directory at $MLFLOW_3_DIR..."
-        rm -rf "$MLFLOW_3_DIR"
-    else
-        echo "MLFLOW directory not found at $MLFLOW_2_DIR."
-    fi
-
-    if [ -d "$MLFLOW_2_DIR" ]; then
-        echo "Removing MLFLOW directory at $MLFLOW_2_DIR..."
-        rm -rf "$MLFLOW_2_DIR"
-    else
-        echo "MLFLOW directory not found at $MLFLOW_2_DIR."
-    fi
-
-    if [ -d "$MLFLOW_1_DIR" ]; then
-        echo "Removing MLFLOW directory at $MLFLOW_1_DIR..."
-        rm -rf "$MLFLOW_1_DIR"
-    else
-        echo "MLFLOW directory not found at $MLFLOW_1_DIR."
-    fi
-
-    if [ -d "$MLRUNS_DIR" ]; then
-        echo "Removing MLFLOW directory at $MLRUNS_DIR..."
-        rm -rf "$MLRUNS_DIR"
-    else
-        echo "MLFLOW directory not found at $MLRUNS_DIR."
-    fi
-
-    #remover models
+    # Remove model files
     if [ -d "$MODELS_DIR" ]; then
         echo "Removing contents of directory at $MODELS_DIR..."
         rm -f "$MODELS_DIR"/*.joblib
     else
-        echo "MLFLOW directory not found at $MLRUNS_DIR."
+        echo "Models directory not found at $MODELS_DIR."
     fi
-
 
     # Remove the PHYSIONET directory
     if [ -d "$PHYSIONET_DIR" ]; then
@@ -78,8 +63,12 @@ cleanup() {
         echo "PHYSIONET directory not found at $PHYSIONET_DIR."
     fi
 
+    # Remove all __pycache__ directories
+    remove_pycache
+
     echo "Cleanup complete."
 }
 
-#run the cleanup function
+# Run the cleanup function
 cleanup
+

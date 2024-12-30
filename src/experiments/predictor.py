@@ -8,6 +8,8 @@ from src.data_processing.preprocessor import Preprocessor
 from src.data_processing.extract_epochs import EpochExtractor
 from src.utils.eeg_plotter import EEGPlotter
 from src.data_processing.concatenate_epochs import EpochConcatenator
+from sklearn.base import BaseEstimator
+from typing import Optional
 
 import numpy as np
 import sys
@@ -17,7 +19,6 @@ import logging
 import time
 
 from sklearn.model_selection import  cross_val_score, KFold
-from sklearn.model_selection import KFold
 
 
 
@@ -43,9 +44,22 @@ logger.addHandler(stream_handler)
 class ExperimentPredictor:
 	"""
 	Handles loading the model, preprocessing data, making predictions, 
-	and calculating statistics (accuracy, cross-validation, etc.).
+	and calculating statistics such as accuracy and cross-validation scores.
+
+	Attributes:
+		plot_eeg (bool): Flag to enable or disable EEG plotting.
+		data_preprocessor (Preprocessor): Handles raw data loading and filtering.
+		extract_epochs (EpochExtractor): Extracts epochs and associated labels from filtered data.
+		feature_extractor (FeatureExtractor): Extracts features from epochs.
+		eeg_plotter (EEGPlotter): Plots EEG signals for visual inspection.
 	"""
-	def __init__(self, plot_eeg=False):
+	def __init__(self, plot_eeg: bool=False) -> None:
+		"""
+		Initializes the ExperimentPredictor with optional EEG plotting and required components.
+
+		Args:
+			plot_eeg (bool): Whether to enable EEG plotting. Default is `False`.
+		"""
 		self.plot_eeg = plot_eeg
 		self.data_preprocessor = Preprocessor()
 		self.extract_epochs = EpochExtractor()
@@ -54,9 +68,18 @@ class ExperimentPredictor:
 
 
 
-	def load_and_filter_data(self, predict):
+	def load_and_filter_data(self, predict: str) -> tuple[dict, dict, list]:
 		"""
-		Loads raw data from a path, filters it, and extracts epochs/labels.
+		Loads raw data, applies filtering, and extracts epochs and labels.
+
+		Args:
+			predict (str): Path to the file containing raw EEG data.
+
+		Returns:
+			Tuple: A Tuple containing:
+				epochs_dict (dict): Extracted epochs.
+				labels_dict (dict): Associated labels.
+				run_groups (list): List of experimental run groups.
 		"""
 		logging.info("Loading raw data...")
 		loaded_raw_data = self.data_preprocessor.load_raw_data(data_path=predict)
@@ -69,9 +92,20 @@ class ExperimentPredictor:
 
 
 
-	def load_model(self, model_path):
+	def load_model(self, model_path: str) -> Optional[BaseEstimator]:
 		"""
-		Tries to load a model (pipeline) from a given path.
+		Loads a trained model pipeline from the specified path.
+
+		Args:
+			model_path (str): Path to the saved model file.
+
+		Returns:
+			Pipeline: The loaded machine learning pipeline from the .joblib file.
+			None: If the file does not exist.
+
+		Logs:
+			A success message if the model is loaded successfully.
+			A warning if the model file is not found.
 		"""
 		try:
 			pipeline = joblib.load(model_path)
@@ -83,9 +117,21 @@ class ExperimentPredictor:
 
 
 
-	def predict_chunk(self, pipeline, test_features):
+	def predict_chunk(self, pipeline: BaseEstimator, test_features: np.ndarray) -> tuple[np.ndarray, float]:
 		"""
-		Runs inference on a chunk of features using a trained pipeline.
+		Makes predictions on a chunk of features using the trained pipeline.
+
+		Args:
+			pipeline (Pipeline): The trained model pipeline.
+			test_features (np.ndarray): Features for the current chunk.
+
+		Returns:
+			Tuple: A Tuple containing:
+				predictions (np.ndarray): Predicted labels for the chunk.
+				inference_time (float): Time taken for inference.
+
+		Logs:
+			The inference time for the chunk.
 		"""
 		start_time = time.time()
 		predictions = pipeline.predict(test_features)
@@ -97,10 +143,30 @@ class ExperimentPredictor:
 
 
 
-	def evaluate_experiment(self, epochs_predict, labels_predict, pipeline, group, run_key, chunk_size=7):
+	def evaluate_experiment(self, epochs_predict:dict, labels_predict:dict, pipeline: BaseEstimator, group:dict, run_key:str, chunk_size: int=7) -> tuple[float, float]:
 		"""
-		Evaluates predictions on an entire run group (split into chunks), 
-		and optionally plots EEG signals if self.plot_eeg is True.
+		Evaluates the model's performance on an entire experimental run group.
+
+		This method calculates chunk-wise and overall accuracy, performs cross-validation,
+		and optionally plots EEG signals if `plot_eeg` is enabled.
+
+		Args:
+			epochs_predict (dict): Dictionary of epochs for prediction.
+			labels_predict (dict): Dictionary of labels for prediction.
+			pipeline (Pipeline): The trained machine learning pipeline.
+			group (dict): experimental group ids.
+			run_key (str): Id for the current run.
+			chunk_size (int): Number of samples per chunk. Default is `7`.
+
+		Returns:
+			Tuple: A Tuple containing:
+				overall_accuracy (float): The overall accuracy for the run.
+				mean_cross_val_accuracy (float): The mean accuracy from cross-validation.
+
+		Logs:
+			Accuracy for each chunk.
+			Overall accuracy for the run.
+			Cross-validation scores and their mean.
 		"""
 		feature_extraction_method = 'baseline' if (group['runs'][0] in [1, 2]) else 'events'
 		
