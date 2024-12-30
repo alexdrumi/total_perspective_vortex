@@ -31,7 +31,7 @@ import mlflow
 import mlflow.sklearn
 from mlflow.models.signature import infer_signature
 
-from src.mlflow_integration.mlflow_manager import MlflowManager
+from src.mlflow.mlflow_manager import MlflowManager
 from src.data_processing.preprocessor import Preprocessor
 from src.pipeline.feature_extractor import FeatureExtractor
 from src.pipeline.pca import My_PCA
@@ -93,7 +93,13 @@ def main():
 		logging.error(f"Invalid EDF data: {e}")
 	except TypeError as e:
 			logging.error(f"{e}")
+	
 
 
 if __name__ == '__main__':
-	main()
+	try:
+		main()
+	except KeyboardInterrupt:
+		logging.info("CTRL+C pressed. Cleaning up...")
+		#what should I cleanup here? ports closed from mlflow no?
+		sys.exit(0)

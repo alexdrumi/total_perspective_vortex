@@ -4,9 +4,11 @@ from src.experiments.grid_search import GridSearchManager
 from src.pipeline.pipeline_executor import PipelineExecutor
 from src.utils.command_line_parser import CommandLineParser
 from src.pipeline.feature_extractor import FeatureExtractor
-from src.mlflow_integration.mlflow_manager import MlflowManager
+from src.mlflow.mlflow_manager import MlflowManager
 from src.data_processing.preprocessor import Preprocessor
 from src.data_processing.extract_epochs import EpochExtractor
+
+import mlflow
 train = [
 
 	#run 3,7,11
@@ -1443,7 +1445,7 @@ class ExperimentTrainerFacade:
 			
 			if self.mlflow_enabled == True:
 				#log metrics to mlflow
-				with self.mlflow_manager.start_run(run_name=group_key):
+				with mlflow.start_run(run_name=group_key):
 					#we could use the pipeline executor as an external function to save pipeline metrics?
 					self.mlflow_manager.log_mlflow_experiment(group_key, best_params, best_score, best_pipeline, X_train, y_train) #this also dumps model
 			else:

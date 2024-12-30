@@ -27,10 +27,6 @@ class PipelineBuilder():
 		"""
 		Builds the pipeline with n_components to be used in the PCA dimensionality reduction.
 
-		Args:
-			n_components (int): amount of components to be used in PCA.
-			classifier (sklearn classifier): Classifier specified at construction. Defaults to MultiLayerPerceptronClassifier.
-		
 		Returns:
 			Pipeline: A sckit-learn pipeline object with the specified parameters.	
 		"""

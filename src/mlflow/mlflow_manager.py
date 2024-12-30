@@ -41,7 +41,7 @@ class MlflowManager():
 		#save model
 		signature = infer_signature(X_train, y_train)
 		#best_pipeline = grid_search.best_estimator_
-		model_filename = f"../models/pipe_{group_key}.joblib"
+		model_filename = f"../../models/pipe_{group_key}.joblib"
 		joblib.dump(best_pipeline, model_filename)
 
 		#log model to mlflow
