@@ -3,15 +3,15 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 import sys
 
-
-
-
 class CustomScaler(BaseEstimator, TransformerMixin):
 	def __init__(self):
 		"""
 		A custom scaler for 3D arrays. Scales each feature dimension separately using standardscaler.
 		Initializes the custromscaler with a dictionary to store individual standardscaler instances
 		for each feature dimension.
+		
+		Returns:
+			None
 		"""
 		self.scalers = {}
 	
@@ -51,9 +51,6 @@ class CustomScaler(BaseEstimator, TransformerMixin):
 
 		Returns:
 			np.ndarray: Scaled data of the same shape as input.
-
-		Raises:
-			ValueError: If the scaler is not fitted before calling transform.
 		"""
 		if not self.scalers: #unlikely
 			raise ValueError("CustomScaler has not been fitted yet.")

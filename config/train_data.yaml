@@ -35,8 +35,21 @@ data_paths:
 
 
 
-#run 3,8,11
+#run 3,7,11
 - ../../data/S001/S001R03.edf
+- ../../data/S001/S001R07.edf
+- ../../data/S001/S001R11.edf
+- ../../data/S002/S002R03.edf
+- ../../data/S002/S002R07.edf
+- ../../data/S002/S002R11.edf
+- ../../data/S003/S003R03.edf
+- ../../data/S003/S003R07.edf
+- ../../data/S003/S003R11.edf
+- ../../data/S004/S004R03.edf
+- ../../data/S004/S004R07.edf
+- ../../data/S004/S004R11.edf
+- ../../data/S005/S005R03.edf
+- ../../data/S005/S005R07.edf
 - ../../data/S005/S005R11.edf
 - ../../data/S006/S006R03.edf
 - ../../data/S006/S006R07.edf
@@ -98,7 +111,6 @@ data_paths:
 - ../../data/S025/S025R03.edf
 - ../../data/S025/S025R07.edf
 - ../../data/S025/S025R11.edf 
-
 
 # #run 4,8,12
 - ../../data/S001/S001R04.edf
@@ -321,3 +333,15 @@ data_paths:
 - ../../data/S021/S021R06.edf
 - ../../data/S021/S021R10.edf
 - ../../data/S021/S021R14.edf
+- ../../data/S022/S022R06.edf
+- ../../data/S022/S022R10.edf
+- ../../data/S022/S022R14.edf
+- ../../data/S023/S023R06.edf
+- ../../data/S023/S023R10.edf
+- ../../data/S023/S023R14.edf
+- ../../data/S024/S024R06.edf
+- ../../data/S024/S024R10.edf
+- ../../data/S024/S024R14.edf
+- ../../data/S025/S025R06.edf
+- ../../data/S025/S025R10.edf
+- ../../data/S025/S025R14.edf

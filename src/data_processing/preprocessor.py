@@ -5,19 +5,16 @@ import mne
 import os
 import yaml
 
-'''
-TODO: 
--MAP THIS FOR ALL RUNS NOT JUST 3,7,11 TO HAVE THE REST OF THE EXPERIMENTS
--ADD MORE CHANNELS TO CLASSIFY ALL OTHER MAPPING OTHER THAN PURE LEFT FIST AND RIGHT FIST
-
-
-'''
 
 class Preprocessor:
 	def __init__(self):
+		"""
+		Initializes the Preprocessor with expected data channels and experiment configurations.
+
+		Returns:
+			None
+		"""
 		self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
-		# self.data_channels =  ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
-		self.raw_data = []
 		self.experiments_list = [
 			{
 				"runs": [3,7,11],
@@ -53,7 +50,16 @@ class Preprocessor:
 
 
 
-	def get_experiment_by_run(self, run_nr):
+	def get_experiment_by_run(self, run_nr: str) -> None:
+		"""
+		Retrieves the experiment configuration corresponding to the given run number.
+
+		Args:
+			run_nr (str): The run number.
+
+		Returns:
+			Optional[dict]: The experiment configuration if found, otherwise None.
+		"""	
 		for experiment in self.experiments_list:
 			if run_nr in experiment['runs']:
 				return experiment
@@ -61,7 +67,16 @@ class Preprocessor:
 
 
 
-	def load_raw_data(self, data_path: List[str]):
+	def load_raw_data(self, data_path: List[str]) -> dict:
+		"""
+		Loads raw data from the specified YAML configuration file and concatenates data by experiment group.
+
+		Args:
+			data_path (List[str]): List of paths to the data files.
+
+		Returns:
+			dict: Dictionary with keys corresponding to experiment groups and values as concatenated raw data or None.
+		"""
 		loaded_raw_data = []
 		concatted_raw_data_dict = {
 			'1': [],
@@ -139,7 +154,19 @@ class Preprocessor:
 # 
 
 
-	def filter_frequencies(self, raw: mne.io.Raw, lo_cut: float, hi_cut: float, noise_cut: float):
+	def filter_frequencies(self, raw: mne.io.Raw, lo_cut: float, hi_cut: float, noise_cut: float) -> mne.io.Raw:
+		"""
+		Filters the raw EEG data by applying a bandpass filter followed by a notch filter.
+
+		Args:
+			raw (mne.io.Raw): The raw EEG data.
+			lo_cut (float): Low cutoff frequency.
+			hi_cut (float): High cutoff frequency.
+			noise_cut (float): Frequency for the notch filter.
+
+		Returns:
+			mne.io.Raw: The filtered EEG data.
+		"""
 		filtered_lo_hi = raw.copy().filter(lo_cut, hi_cut)
 		filter_noise = filtered_lo_hi.notch_filter(noise_cut)
 
@@ -147,13 +174,22 @@ class Preprocessor:
 
 
 
-	def filter_raw_data(self, loaded_raw_data) -> List[mne.io.Raw]:
+	def filter_raw_data(self, loaded_raw_data) -> dict:
+		"""
+		Applies filtering to the loaded raw data.
+
+		Args:
+			loaded_raw_data: Dictionary containing raw data for each experiment group.
+
+		Returns:
+			dict: Dictionary with filtered raw data for each group.
+		"""
 		filtered_data_dict = {}
 		for key, raw in loaded_raw_data.items():
 			if raw is not None:  #ensure there is data to filter
 				raw.load_data()  #load for filtering
 				current_filtered = self.filter_frequencies(raw, lo_cut=0.1, hi_cut=30, noise_cut=50)
-				filtered_data_dict[key] = raw
+				filtered_data_dict[key] = current_filtered
 			else:
 				print(f'KEY {key} IS EMPTY')
 				filtered_data_dict[key] = None #handle empty keys if needed

@@ -2,14 +2,16 @@ import numpy as np
 import mne
 from typing import List, Tuple
 
-
-
 class FeatureExtractor():
 	def __init__(self) -> None:
 		"""
-		The object extracts features of the given data based on the following paper:
+		Initializes the FeatureExtractor object for extracting features based on mean, energy, and power.
+		The object will extracts features of the given data based on the following paper:
 			- doi:10.1016/s1388-2457(01)00661-7
 			- https://arxiv.org/pdf/1312.2877.pdf
+
+		Returns:
+			None
 		"""
 		pass
 
@@ -70,7 +72,7 @@ class FeatureExtractor():
 		Returns:
 			np.ndarray: Concatenated feature matrix of shape (n_epochs, n_features).
 		"""
-		sfreq = 160.0 #this keeps some of them out from the training but otherwise we would have to alter the structure of the pipeline, for now this is ok
+		sfreq = 160.0 #this keeps a negligable part of the data out from the training but otherwise we would have to alter the structure of the pipeline, for now this is ok
 		analysis = {
 			'mrcp': {'tmin': -2, 'tmax': 0, 'lofreq': 3, 'hifreq': 30},
 			'erd': {'tmin': -2, 'tmax': 0, 'lofreq': 8, 'hifreq': 30},
@@ -78,13 +80,12 @@ class FeatureExtractor():
 		}
 
 		if run_type == 'baseline':  #if run 1 or 2. tmin and tmax are derived from events; T0 mostly in the epoch extractor
-			for key in analysis:
-				analysis[key]['tmin'] = 0
+			for key in analysis: #the tmin tmax are consistnetly the timeframes for baseline events
+				analysis[key]['tmin'] = 0 
 				analysis[key]['tmax'] = 0.793
 
 		feature_matrices = []
 		for analysis_name, params in analysis.items():
-			print(f'{params['tmin']} tmin, {params['tmax']} is tmax\n\n')
 			cropped_epochs = extracted_epochs_dict.copy().crop(tmin=params['tmin'], tmax=params['tmax'])
 			print(f"  - Cropped epochs for analysis '{analysis_name}': {params['tmin']} to {params['tmax']} seconds.")
 

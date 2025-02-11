@@ -10,19 +10,16 @@ from sklearn.base import BaseEstimator
 import yaml
 import numpy as np
 
-class GridSearchManager():
+class GridSearchManager:
 	"""
-	Manages the setup and execution of grid search for hyperparameter tuning.
-
-	This class integrates with various classifiers, reads configurations from a YAML file,
-	and uses GridSearchCV to perform hyperparameter optimization.
-
-	Attributes:
-		classifier_mapping (dict): A dictionary mapping classifier names to scikit-learn classifier objects.
+	Manages grid search hyperparameter tuning.
 	"""
 	def __init__(self) -> None:
 		"""
-		Initializes the GridSearchManager with a predefined mapping of classifiers.
+		Initializes the GridSearchManager with a mapping of classifiers.
+
+		Returns:
+			None
 		"""
 		self.classifier_mapping = {
 				'MLPClassifier': MLPClassifier(max_iter=10000,early_stopping=True,n_iter_no_change=50,verbose=False),
@@ -36,7 +33,7 @@ class GridSearchManager():
 	#this could be an external function as well, using it in dataset preprocessor
 	def load_config(self) -> dict:
 		"""
-		Loads the grid search parameters from a YAML configuration file.
+		Loads grid search parameters from a YAML configuration file.
 
 		Returns:
 			dict: A dictionary containing the grid search parameters.
@@ -73,7 +70,7 @@ class GridSearchManager():
 		Creates a GridSearchCV object with the prepared parameter grid.
 
 		Args:
-			pipeline: The pipeline or model to be optimized.
+			pipeline (BaseEstimator): The pipeline or model to be optimized.
 
 		Returns:
 			GridSearchCV: Configured GridSearchCV object.
@@ -100,13 +97,13 @@ class GridSearchManager():
 			grid_search (GridSearchCV): The completed GridSearchCV object.
 
 		Returns:
-			Tuple: A Tuple containing:
+			Tuple:
 				best_params (dict): The best parameters from the grid search.
 				best_score (float): The best accuracy score.
-				best_pipeline (Pipeline): The pipeline corresponding to the best parameters.
+				best_pipeline (BaseEstimator): The pipeline corresponding to the best parameters.
 		"""
 		best_params = {k: (float(v) if isinstance(v, (np.float64, np.float32)) else v) for k, v in grid_search.best_params_.items()}
-		best_score = float(grid_search.best_score_)  # Ensure it's a Python float
+		best_score = float(grid_search.best_score_)  #ensure this is python float
 		best_pipeline = grid_search.best_estimator_
 
 		return best_params, best_score, best_pipeline
@@ -117,15 +114,15 @@ class GridSearchManager():
 		Executes grid search on the given pipeline and training data.
 
 		Args:
-			pipeline: The pipeline or model to optimize.
+			pipeline (BaseEstimator): The pipeline or model to optimize.
 			X_train (np.ndarray): Training feature data.
 			y_train (np.ndarray): Training target data.
 
 		Returns:
-			Tuple: A Tuple containing:
-				- best_params (dict): The best parameters from the grid search.
-				- best_score (float): The best accuracy score.
-				- best_pipeline (Pipeline): The pipeline corresponding to the best parameters.
+			Tuple:
+				best_params (dict): The best parameters from the grid search.
+				best_score (float): The best accuracy score.
+				best_pipeline (BaseEstimator): The pipeline corresponding to the best parameters.
 		"""
 		grid_search = self.create_grid_search(pipeline)
 		grid_search.fit(X_train, y_train)

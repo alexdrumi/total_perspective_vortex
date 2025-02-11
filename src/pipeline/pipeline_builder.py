@@ -6,8 +6,6 @@ from sklearn.pipeline import Pipeline
 from typing import Optional
 from sklearn.base import BaseEstimator
 
-
-
 class PipelineBuilder():
 	def __init__(self, n_components: int = 2, classifier: Optional[BaseEstimator] = None) -> None:
 		"""
@@ -17,6 +15,8 @@ class PipelineBuilder():
 			n_components (int): amount of components to be used in PCA.
 			classifier (Optional[BaseEstimator]): Classifier specified at construction. Defaults to MultiLayerPerceptronClassifier.
 		
+		Returns:
+			None
 		"""
 		self.n_components = n_components
 		self.classifier = classifier

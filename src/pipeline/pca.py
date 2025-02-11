@@ -1,7 +1,6 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 
-
 class My_PCA(BaseEstimator, TransformerMixin):
 	def __init__(self, n_comps: int = 2) -> None:
 		"""
@@ -9,6 +8,9 @@ class My_PCA(BaseEstimator, TransformerMixin):
 
 		Args:
 			n_comps (int): Number of principal components to retain.
+		
+		Returns:
+			None
 		"""
 		self.n_comps = n_comps
 		self.basis = None
@@ -25,7 +27,7 @@ class My_PCA(BaseEstimator, TransformerMixin):
 			y (None): ignore it, just placed here for compatibility.
 
 		Returns:
-			self: Fitted My_PCA object.
+			My_PCA: Fitted My_PCA object.
 		"""
 		self.mean_ = np.mean(x_features, axis=0)
 		self.mean_ = np.reshape(np.asarray(self.mean_), (-1,)) #consistent for 1d operations

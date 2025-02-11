@@ -1,3 +1,7 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.pipeline.pipeline_builder import PipelineBuilder
 from src.experiments.grid_search import GridSearchManager
@@ -7,44 +11,31 @@ from src.pipeline.feature_extractor import FeatureExtractor
 from src.mlflow.mlflow_manager import MlflowManager
 from src.data_processing.preprocessor import Preprocessor
 from src.data_processing.extract_epochs import EpochExtractor
+from src.utils.data_and_model_checker import check_data, check_models
 import mlflow
 
-#create a facade which interacts with all the subsystems
+
+
+#create a facade which interacts with all the subsystems, eventually will have to replace the simple class with dependency injection version
 class ExperimentTrainerFacade:
 	"""
-	A facade class to manage the end-to-end training and evaluation of the selected machine learning models.
+	A facade class to manage the end-to-end training and evaluation of machine learning models.
 
-	This class integrates multiple components such as data preprocessing, epoch extraction,
-	feature extraction, pipeline building, grid search, and MLflow logging. It provides
-	a streamlined interface for running experiments and processing groups of experimental runs.
-
-	Attributes:
-		command_line_parser (CommandLineParser): Handles command-line arguments.
-		mlflow_manager (MlflowManager): Manages MLflow operations such as starting the server and logging experiments.
-		data_preprocessor (Preprocessor): Handles raw data loading and filtering.
-		extract_epochs (EpochExtractor): Extracts epochs and associated labels from the filtered data.
-		feature_extractor (FeatureExtractor): Extracts features from epochs.
-		pipeline_executor (PipelineExecutor): Executes and evaluates trained pipelines.
-		pipeline_builder (PipelineBuilder): Builds machine learning pipelines.
-		grid_search (GridSearchManager): Performs hyperparameter tuning using sklearn's GridSearch search.
-		mlflow_enabled (bool): Flag indicating whether MLflow logging is enabled.
-
-	Args:
-		config_path (str): Path to the configuration file for grid search parameters. Default is `'../config/grid_search_parameters.yaml'`.
-		mlflow_enabled (bool): Flag to enable or disable MLflow server. Default is `False`.
-
-	Methods:
-		run_experiment():
-			Executes the experiment pipeline, including data preprocessing,
-			feature extraction, pipeline building, and grid search. If enabled, logs metrics to MLflow.
-
-		process_run_groups(run_groups, epochs_dict, labels_dict, mlflow_enabled):
-			Processes each group of experimental runs, performs feature extraction,
-			grid search, and logs results or saves the trained models.
+	This class integrates components such as data preprocessing, epoch extraction,
+	feature extraction, pipeline building, grid search, and MLflow logging.
 	"""
 
-
 	def __init__(self, config_path: str ='../config/grid_search_parameters.yaml', mlflow_enabled: bool =False) -> None:
+		"""
+		Initializes the ExperimentTrainerFacade.
+
+		Args:
+			config_path (str): Path to the configuration file for grid search parameters.
+			mlflow_enabled (bool): Flag to enable or disable MLflow logging.
+
+		Returns:
+			None
+		"""
 		self.command_line_parser = CommandLineParser( #we can make this more elegant with passing another config?
 			[{
 					'name': '--mlflow',
@@ -69,22 +60,17 @@ class ExperimentTrainerFacade:
 		"""
 		Executes the full experiment pipeline.
 
-		This method handles the following steps:
-			Parses command-line arguments to determine if MLflow should be enabled.
-			Starts the MLflow server if enabled.
-			Loads and preprocesses raw data.
-			Extracts epochs and associated labels.
-			Processes experimental run groups to train and evaluate models.
+		This method parses command-line arguments, starts the MLflow server (if enabled),
+		loads and preprocesses raw data, extracts epochs and labels, and processes experimental run groups.
 
-		It prints status messages indicating progress through the pipeline.
-
-		Raises:
-			Exception: If any component fails during execution.
+		Returns:
+			None
 		"""
 		self.mlflow_enabled = self.command_line_parser.parse_arguments()
 		if (self.mlflow_enabled == True):
 			self.mlflow_manager.start_mlflow_server()
 
+		check_data() #for this no need to check models
 		#load data
 		raw_data = self.data_preprocessor.load_raw_data('../../config/train_data.yaml')
 		filtered_data = self.data_preprocessor.filter_raw_data(raw_data) #this returns a triplet now
@@ -103,15 +89,13 @@ class ExperimentTrainerFacade:
 		Processes each group of experimental runs to train and evaluate models.
 
 		Args:
-			run_groups (list): List of groups with experimental runs to process.
+			run_groups (dict): Dictionary of groups with experimental runs to process.
 			epochs_dict (dict): Dictionary containing epochs for each experimental run.
 			labels_dict (dict): Dictionary containing labels for each experimental run.
 			mlflow_enabled (bool): Flag to enable or disable MLflow logging.
 
-		It prints status messages and results for each processed group.
-
-		Raises:
-			ValueError: If no available runs exist for a group.
+		Returns:
+			None
 		"""
 		for groups in run_groups:
 			groups_runs = groups['runs']

@@ -297,7 +297,6 @@ data_paths:
 # - ../../data/S025/S025R03.edf
 # - ../../data/S025/S025R07.edf
 # - ../../data/S025/S025R11.edf
-
 - ../../data/S026/S026R03.edf
 - ../../data/S026/S026R07.edf
 - ../../data/S026/S026R11.edf
@@ -956,7 +955,6 @@ data_paths:
 # - ../../data/S025/S025R05.edf
 # - ../../data/S025/S025R09.edf
 # - ../../data/S025/S025R13.edf
-
 - ../../data/S026/S026R05.edf
 - ../../data/S026/S026R09.edf
 - ../../data/S026/S026R13.edf
@@ -1274,19 +1272,19 @@ data_paths:
 # - ../../data/S021/S021R06.edf
 # - ../../data/S021/S021R10.edf
 # - ../../data/S021/S021R14.edf
+# - ../../data/S022/S022R06.edf
+# - ../../data/S022/S022R10.edf
+# - ../../data/S022/S022R14.edf
+# - ../../data/S023/S023R06.edf
+# - ../../data/S023/S023R10.edf
+# - ../../data/S023/S023R14.edf
+# - ../../data/S024/S024R06.edf
+# - ../../data/S024/S024R10.edf
+# - ../../data/S024/S024R14.edf
+# - ../../data/S025/S025R06.edf
+# - ../../data/S025/S025R10.edf
+# - ../../data/S025/S025R14.edf
 
-- ../../data/S022/S022R06.edf
-- ../../data/S022/S022R10.edf
-- ../../data/S022/S022R14.edf
-- ../../data/S023/S023R06.edf
-- ../../data/S023/S023R10.edf
-- ../../data/S023/S023R14.edf
-- ../../data/S024/S024R06.edf
-- ../../data/S024/S024R10.edf
-- ../../data/S024/S024R14.edf
-- ../../data/S025/S025R06.edf
-- ../../data/S025/S025R10.edf
-- ../../data/S025/S025R14.edf
 - ../../data/S026/S026R06.edf
 - ../../data/S026/S026R10.edf
 - ../../data/S026/S026R14.edf

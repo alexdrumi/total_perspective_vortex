@@ -8,12 +8,18 @@ import numpy as np
 from mlflow.models.signature import infer_signature
 from sklearn.base import BaseEstimator
 
-class MlflowManager():
+class MlflowManager:
 	"""
 	A class to manage MLflow operations, including starting the MLflow server 
 	and logging experiment details, parameters, and models.
 	"""
 	def __init__(self):
+		"""
+		Initializes the Mlflow manager
+		
+		Returns:
+			None
+		"""
 		pass
 
 
@@ -25,6 +31,9 @@ class MlflowManager():
 		using a subprocess and configures MLflow to use this URI as the tracking server.
 
 		It prints a message indicating that MLflow is running and the URL where it can be accessed.
+		
+		Returns:
+			None
 		"""
 		subprocess.Popen(["mlflow", "ui"])
 		mlflow.set_tracking_uri("http://localhost:5000")  #uri
@@ -62,6 +71,9 @@ class MlflowManager():
 		Notes:
 			The model is logged with a signature inferred from the training data.
 			The pipeline is registered with MLflow under a name derived from the group key.
+		
+		Return:
+			None
 		"""
 		mlflow.set_experiment(f"{group_key}")
 		

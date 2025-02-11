@@ -14,6 +14,7 @@ grid_search_params:
   classifier__solver: ['liblinear']
   classifier__max_iter: [1000, 5000]
 
+#->MLP and LogReg was the best, rest just takes time. When I implement it multithreaded, can do all of them.
 
 # - classifier: "SVC"
 #   pca__n_comps: [20, 42, 50]

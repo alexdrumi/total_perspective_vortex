@@ -67,21 +67,21 @@ logger.addHandler(stream_handler)
 
 mne.set_log_level(verbose='WARNING')
 
+#eeg channels to read data from->in the paper
 channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
-# channels = ["Fc1.","Fc2.", "Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
-            # "CP3",
-            # "CP1",
-            # "CPz",
-            # "CP2",
-            # "CP4",
-            # "Fpz",
 
 
+#-------------------------------------------------------
 
 def main():
 	try:
 		trainer = ExperimentTrainerFacade()
+		import time
+		start = time.time()
 		trainer.run_experiment()
+		end = time.time()
+
+		print(f"The time the script took to make the model is: {end - start}")
 
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")

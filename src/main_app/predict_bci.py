@@ -2,6 +2,15 @@ import numpy as np
 import mne
 import sys
 import matplotlib.pyplot as plt
+import joblib
+import logging
+import time
+import yaml
+import os
+
+#add the  src dir to the system path
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.append(src_path)
 
 from sklearn.preprocessing import StandardScaler, FunctionTransformer
 from sklearn.decomposition import PCA
@@ -12,20 +21,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import ShuffleSplit, cross_val_score, KFold
-from sklearn.model_selection import KFold
 
-
-import joblib
-import logging
-import time
-import yaml
-import os
-
-# Add the `src` directory to the system path
-src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-sys.path.append(src_path)
-
-from myapp import PredictOrchestrator
+from src.experiments.predictor import PredictOrchestrator
 from src.pipeline.custom_scaler import CustomScaler
 from src.pipeline.reshaper import Reshaper
 from src.utils.command_line_parser import CommandLineParser
@@ -33,6 +30,7 @@ from src.data_processing.preprocessor import Preprocessor
 from src.pipeline.feature_extractor import FeatureExtractor
 from src.pipeline.pca import My_PCA
 from src.data_processing.extract_epochs import EpochExtractor
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
@@ -50,13 +48,10 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-
-
+#eeg channels to read data from->in the paper
 channels = ["Fc3.", "Fcz.", "Fc4.", "C3..", "C1..", "Cz..", "C2..", "C4.."]
 
-
 #-------------------------------------------------------
-
 
 def main():
 	try:

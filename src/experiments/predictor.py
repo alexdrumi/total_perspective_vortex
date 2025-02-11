@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from src.pipeline.pipeline_builder import PipelineBuilder
 from src.experiments.grid_search import GridSearchManager
 from src.pipeline.pipeline_executor import PipelineExecutor
@@ -10,13 +14,14 @@ from src.utils.eeg_plotter import EEGPlotter
 from src.data_processing.concatenate_epochs import EpochConcatenator
 from sklearn.base import BaseEstimator
 from typing import Optional
+from src.utils.data_and_model_checker import check_data, check_models
 
 import numpy as np
-import sys
 import matplotlib.pyplot as plt
 import joblib
 import logging
 import time
+import os
 
 from sklearn.model_selection import  cross_val_score, KFold
 
@@ -39,26 +44,104 @@ logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
 
+#main orchestrator for predictions
+class PredictOrchestrator:
+	"""
+	The main orchestrator: parses CLI args, runs the entire experiment.
+	"""
+	def __init__(self):
+		"""
+		Initializes the PredictOrchestrator with command-line argument configuration.
+
+		Returns:
+			None
+		"""
+		argument_config = [
+			{
+				'name': '--plot_eeg_predictions',
+				'type': str,
+				'default': 'false',
+				'choices': ['true', 'false'],
+				'help': 'Enable (True) or disable (False) the visual representation of EEG predictions.'
+			}
+		]
+		self.arg_parser = CommandLineParser(argument_config)
+
+
+	def run(self, predict):
+		"""
+		Runs the prediction pipeline: checks data and models, parses arguments, loads and preprocesses data,
+		and evaluates experiment predictions.
+
+		Args:
+			predict (str): A string parameter used for prediction (e.g., a path to data).
+
+		Returns:
+			None
+		"""
+		check_data()
+		check_models()
+
+		plot_eeg_predictions_enabled = self.arg_parser.parse_arguments()
+		plot_eeg = (plot_eeg_predictions_enabled == True)
+
+		predictor = ExperimentPredictor(plot_eeg=plot_eeg)
+
+		#load and preprocess data
+		epochs_dict, labels_dict, run_groups = predictor.load_and_filter_data(predict)
+
+		total_mean_accuracy_events = []
+		for group in run_groups:
+			groups_runs = group['runs']
+			group_key = f"runs_{'_'.join(map(str, groups_runs))}"
+			model_path = f"../../models/pipe_{group_key}.joblib"
+
+			run_keys = [k for k in epochs_dict.keys() if int(k[-2:]) in groups_runs]
+			if not run_keys:
+				continue
+			
+			pipeline = predictor.load_model(model_path)
+			if pipeline is None:
+				continue
+			
+			run_key = run_keys[0]
+			accuracy, crossval_mean = predictor.evaluate_experiment(
+				epochs_dict, labels_dict, pipeline, group, run_key, chunk_size=7
+			)
+			print(f"\033[1;32mAccuracy of current experiment {run_key} is: {accuracy}\nCross-validation with Kfold mean is: {crossval_mean}\n\033[0m")
+			time.sleep(2)
+
+			#if events are not baseline->with baseline the rating will be heavily scewed, doesnt make sense.
+			#if group['runs'][0] not in [1, 2]: #this would be with all 6 experiments, but just a better outcome in any case.
+			total_mean_accuracy_events.append(accuracy)
+
+		if total_mean_accuracy_events:
+			print("\033[1;32mMean accuracy of the six different experiments for all 109 subjects:\033[0m")
+			for i, accuracy in enumerate(total_mean_accuracy_events):
+				print(f"\033[1;32mExperiment {i}: accuracy = {accuracy:.3f}\033[0m")
+
+			print(f"\033[1;32mMean accuracy of 6 event-based experiments: {np.mean(total_mean_accuracy_events):.3f}\033[0m")
+			print(f"\033[1;32mMean accuracy of 4 event-based experiments without open/closed eyes baseline: {np.mean(total_mean_accuracy_events[2:]):.3f}\033[0m")
+
+			time.sleep(1)
+		else:
+			print("No event-based experiments processed.")
+
 
 
 class ExperimentPredictor:
 	"""
-	Handles loading the model, preprocessing data, making predictions, 
-	and calculating statistics such as accuracy and cross-validation scores.
-
-	Attributes:
-		plot_eeg (bool): Flag to enable or disable EEG plotting.
-		data_preprocessor (Preprocessor): Handles raw data loading and filtering.
-		extract_epochs (EpochExtractor): Extracts epochs and associated labels from filtered data.
-		feature_extractor (FeatureExtractor): Extracts features from epochs.
-		eeg_plotter (EEGPlotter): Plots EEG signals for visual inspection.
+	Handles loading the model, preprocessing data, making predictions, and calculating statistics.
 	"""
 	def __init__(self, plot_eeg: bool=False) -> None:
 		"""
 		Initializes the ExperimentPredictor with optional EEG plotting and required components.
 
 		Args:
-			plot_eeg (bool): Whether to enable EEG plotting. Default is `False`.
+			plot_eeg (bool): Whether to enable EEG plotting. Default is False.
+
+		Returns:
+			None
 		"""
 		self.plot_eeg = plot_eeg
 		self.data_preprocessor = Preprocessor()
@@ -73,12 +156,12 @@ class ExperimentPredictor:
 		Loads raw data, applies filtering, and extracts epochs and labels.
 
 		Args:
-			predict (str): Path to the file containing raw EEG data.
+			predict (str): Path or parameter for raw EEG data.
 
 		Returns:
-			Tuple: A Tuple containing:
-				epochs_dict (dict): Extracted epochs.
-				labels_dict (dict): Associated labels.
+			Tuple:
+				epochs_dict (dict): Dictionary of extracted epochs.
+				labels_dict (dict): Dictionary of associated labels.
 				run_groups (list): List of experimental run groups.
 		"""
 		logging.info("Loading raw data...")
@@ -100,12 +183,7 @@ class ExperimentPredictor:
 			model_path (str): Path to the saved model file.
 
 		Returns:
-			Pipeline: The loaded machine learning pipeline from the .joblib file.
-			None: If the file does not exist.
-
-		Logs:
-			A success message if the model is loaded successfully.
-			A warning if the model file is not found.
+			Optional[BaseEstimator]: The loaded machine learning pipeline, or None if not found.
 		"""
 		try:
 			pipeline = joblib.load(model_path)
@@ -122,23 +200,20 @@ class ExperimentPredictor:
 		Makes predictions on a chunk of features using the trained pipeline.
 
 		Args:
-			pipeline (Pipeline): The trained model pipeline.
+			pipeline (BaseEstimator): The trained model pipeline.
 			test_features (np.ndarray): Features for the current chunk.
 
 		Returns:
-			Tuple: A Tuple containing:
+			Tuple:
 				predictions (np.ndarray): Predicted labels for the chunk.
 				inference_time (float): Time taken for inference.
-
-		Logs:
-			The inference time for the chunk.
 		"""
 		start_time = time.time()
 		predictions = pipeline.predict(test_features)
 		end_time = time.time()
 		inference_time = end_time - start_time
 		logging.debug(f"Prediction time for current chunk: {inference_time:.4f} seconds")
-		print(f'Prediction time for current chunk is: {inference_time:.4f} seconds')
+		# print(f'Prediction time for current chunk is: {inference_time:.4f} seconds')
 		return predictions, inference_time
 
 
@@ -147,26 +222,18 @@ class ExperimentPredictor:
 		"""
 		Evaluates the model's performance on an entire experimental run group.
 
-		This method calculates chunk-wise and overall accuracy, performs cross-validation,
-		and optionally plots EEG signals if `plot_eeg` is enabled.
-
 		Args:
 			epochs_predict (dict): Dictionary of epochs for prediction.
 			labels_predict (dict): Dictionary of labels for prediction.
-			pipeline (Pipeline): The trained machine learning pipeline.
-			group (dict): experimental group ids.
-			run_key (str): Id for the current run.
-			chunk_size (int): Number of samples per chunk. Default is `7`.
+			pipeline (BaseEstimator): The trained machine learning pipeline.
+			group (dict): Experimental group information.
+			run_key (str): Identifier for the current run.
+			chunk_size (int): Number of samples per chunk. Default is 7.
 
 		Returns:
-			Tuple: A Tuple containing:
-				overall_accuracy (float): The overall accuracy for the run.
-				mean_cross_val_accuracy (float): The mean accuracy from cross-validation.
-
-		Logs:
-			Accuracy for each chunk.
-			Overall accuracy for the run.
-			Cross-validation scores and their mean.
+			Tuple:
+				overall_accuracy (float): Overall accuracy for the run.
+				mean_cross_val_accuracy (float): Mean accuracy from cross-validation.
 		"""
 		feature_extraction_method = 'baseline' if (group['runs'][0] in [1, 2]) else 'events'
 		
@@ -217,7 +284,7 @@ class ExperimentPredictor:
 		overall_accuracy = total_correct / (total_chunks * chunk_size)
 		logging.info(f"Overall accuracy for run_key {run_key}: {overall_accuracy:.3f}")
 
-		# Cross-validate
+		#cross-validate
 		kfold = KFold(n_splits=5, shuffle=True, random_state=0)
 		scores = cross_val_score(
 			pipeline, 
@@ -226,7 +293,7 @@ class ExperimentPredictor:
 			scoring='accuracy', 
 			cv=kfold
 		)
-		logging.info(f"Cross-val scores: {scores}")
-		logging.info(f"Mean cross-val accuracy: {scores.mean():.2f}")
+		# logging.info(f"Cross-val scores: {scores}")
+		# logging.info(f"Mean cross-val accuracy: {scores.mean():.2f}")
 
 		return overall_accuracy, scores.mean()
