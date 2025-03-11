@@ -114,6 +114,9 @@ Below you will find the instructions to set up the project locally and prepare y
    python train_bci.py --mlflow=true
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Sources
+  -MNE: https://mne.tools/stable/index.html<br>
+    -Feature exctraction paper: https://arxiv.org/pdf/1312.2877.pdf
 
 ## Project Structure
   ```bash
@@ -132,6 +135,6 @@ Below you will find the instructions to set up the project locally and prepare y
   ├── requirements.txt         #Python dependencies
   ├── cleanup_environment.sh   #Clean-up script for the environment
   ├── setup_environment.sh     #Environment setup script
-  └── README.md                
+  └── README.md
 
 
