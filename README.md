@@ -11,16 +11,19 @@ This repository provides tools to process EEG data for motor imagery tasks using
    cd total_perspective_vortex
 
 2. **Setup virtual environment and download data**:
-source ./setup_environment
-
+   ```bash
+   source ./setup_environment
 
 3. **Usage**:
 
 **Train your model**:
-cd src/main_app
-python train_bci.py
+   ```bash
+   cd src/main_app
+   python train_bci.py
+
 
 Or for mlflow server and registry upload possibility
+
 
 python train_bci.py --mlflow=true 
 
@@ -29,36 +32,28 @@ python train_bci.py --mlflow=true
 -Classifies and logs results
 
 **Predict**:
-
-cd src/main_app
-python predict_bci.py
+   ```bash
+   cd src/main_app
+   python predict_bci.py
 
 
 4. **Project structure**:
-total_perspective_vortex/
-├─ data/            # Your .edf files (not committed)
-├─ logs/            # Log files
-├─ src/
-│  └─ main_app/
-│      └─ train_bci.py  # Main training script
-├─ requirements.txt
-└─ README.md
-
-
-├── config
-├── data #.edf files (not committed)
-├── logs
-├── models #.joblib model files (after training)
-├── src
-│   ├── data_processing
-│   ├── experiments
-│   ├── main_app
-│   ├── mlflow
-│   ├── pipeline
-│   └── utils
-├── requirements.txt
-├── cleanup_environment.sh
-├── setup_environment.sh
+   ```bash
+   
+   ├── config
+   ├── data #.edf files (not committed)
+   ├── logs
+   ├── models #.joblib model files (after training)
+   ├── src
+   │   ├── data_processing
+   │   ├── experiments
+   │   ├── main_app
+   │   ├── mlflow
+   │   ├── pipeline
+   │   └── utils
+   ├── requirements.txt
+   ├── cleanup_environment.sh
+   ├── setup_environment.sh
 
 
 5. **Methodology**:
