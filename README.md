@@ -1,16 +1,6 @@
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
 
-<!-- PROJECT SHIELDS (Optional) -->
-<!--
-*** You can remove any badges that are not relevant, or update the URLs to match your repo.
--->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![project_license][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
 <br />
 <div align="center">
@@ -19,10 +9,10 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a> -->
 
-  <h3 align="center">Total Perspective Vortex: EEG Motor Imagery Classification</h3>
+  <h3 align="center">Total Perspective Vortex: EEG Motor Imagery Classification Machine Learning </h3>
 
   <p align="center">
-    We provide tools to process EEG data for motor imagery tasks using Python, MNE, and scikit-learn.
+    A tool to process EEG data for motor imagery tasks using Python, scikit-learn, MNE and Mlflow.
     <br />
     <a href="https://github.com/your_username/total_perspective_vortex"><strong>Explore the docs »</strong></a>
     <br />
@@ -35,7 +25,6 @@
   </p>
 </div>
 
----
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -79,7 +68,6 @@ This repository provides tools to process EEG data for motor imagery tasks using
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
----
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -115,8 +103,9 @@ Below you will find the instructions to set up the project locally and prepare y
 ## Sources
   -MNE: https://mne.tools/stable/index.html<br>
   -Feature exctraction paper: https://arxiv.org/pdf/1312.2877.pdf<br>
-  -Sckit learn docs: https://scikit-learn.org/stable/
+  -Sckit learn docs: https://scikit-learn.org/stable/<br>
   -Principal Component Analysis (PCA): https://www.cs.cmu.edu/~elaw/papers/pca.pdf
+
 ## Project Structure
   ```bash
   total_perspective_vortex/
