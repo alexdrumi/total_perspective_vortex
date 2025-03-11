@@ -115,4 +115,23 @@ Below you will find the instructions to set up the project locally and prepare y
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
+## Project Structure
+  ```bash
+  total_perspective_vortex/
+  ├── config/                  #Configuration files
+  ├── data/                    #.edf files (not committed)
+  ├── logs/                    #Log files
+  ├── models/                  #Saved models (.joblib after training)
+  ├── src/
+  │   ├── data_processing/     #Data preprocessing modules
+  │   ├── experiments/         #Experiment-related scripts
+  │   ├── main_app/            #Main training and prediction scripts
+  │   ├── mlflow/              #MLflow tracking configurations
+  │   ├── pipeline/            #Custom pipeline definitions
+  │   └── utils/               #Utility functions
+  ├── requirements.txt         #Python dependencies
+  ├── cleanup_environment.sh   #Clean-up script for the environment
+  ├── setup_environment.sh     #Environment setup script
+  └── README.md                
+
 
