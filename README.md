@@ -105,19 +105,18 @@ Below you will find the instructions to set up the project locally and prepare y
 4. **(Optional) Enable Mlflow:**
    ```bash
    cd src/main_app
-   python train_bci.py
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
+   python train_bci.py --mlflow=true
 5. **Predict:**
    ```bash
    cd src/main_app
-   python train_bci.py --mlflow=true
+   python predict_bci.py
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Sources
   -MNE: https://mne.tools/stable/index.html<br>
-    -Feature exctraction paper: https://arxiv.org/pdf/1312.2877.pdf
-
+  -Feature exctraction paper: https://arxiv.org/pdf/1312.2877.pdf<br>
+  -Sckit learn docs: https://scikit-learn.org/stable/
+  -Principal Component Analysis (PCA): https://www.cs.cmu.edu/~elaw/papers/pca.pdf
 ## Project Structure
   ```bash
   total_perspective_vortex/
