@@ -1,4 +1,4 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+p<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
 
 <!-- PROJECT SHIELDS (Optional) -->
@@ -92,5 +92,15 @@ Below you will find the instructions to set up the project locally and prepare y
    ```bash
    git clone https://github.com/your_username/total_perspective_vortex.git
    cd total_perspective_vortex
-1. **Clone the repository:**
+2. **Setup environment and download data:**
+   ```bash
+   source ./setup_environment.sh
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+### Usage
+**Train your model**
+   ```bash
+   cd src/main_app
+   python train_bci.py
 
