@@ -1,4 +1,4 @@
-p<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
 
 <!-- PROJECT SHIELDS (Optional) -->
@@ -97,10 +97,22 @@ Below you will find the instructions to set up the project locally and prepare y
    source ./setup_environment.sh
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 ### Usage
-**Train your model**
+3. **Train your model:**
    ```bash
    cd src/main_app
    python train_bci.py
+4. **(Optional) Enable Mlflow:**
+   ```bash
+   cd src/main_app
+   python train_bci.py
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+5. **Predict:**
+   ```bash
+   cd src/main_app
+   python train_bci.py --mlflow=true
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
 
