@@ -213,7 +213,6 @@ class ExperimentPredictor:
 		end_time = time.time()
 		inference_time = end_time - start_time
 		logging.debug(f"Prediction time for current chunk: {inference_time:.4f} seconds")
-		# print(f'Prediction time for current chunk is: {inference_time:.4f} seconds')
 		return predictions, inference_time
 
 

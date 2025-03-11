@@ -42,14 +42,18 @@ from src.utils.command_line_parser import CommandLineParser
 from src.experiments.trainer import ExperimentTrainerFacade
 
 import subprocess
+from pathlib import Path
 
 #logger config
 #logging for both file and console
+
+log_file_path = Path(__file__).resolve().parent.parent.parent / 'logs' / 'error_log.log'
+log_file_path.parent.mkdir(parents=True, exist_ok=True) #checks if there is this folder existing
+
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
-#file handler - Logs to a file
-file_handler = logging.FileHandler('../../logs/error_log.log', mode='w')
+file_handler = logging.FileHandler(log_file_path, mode='w')
 file_handler.setLevel(logging.ERROR)
 
 #stream handler - Logs to terminal (console)
