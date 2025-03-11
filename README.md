@@ -33,9 +33,25 @@ python train_bci.py --mlflow=true
 
 **Predict**:
    ```bash
-   cd src/main_app
-   python predict_bci.py
+   ├── config
+   ├── data #.edf files (not committed)
+   ├── logs
+   ├── models #.joblib model files (after training)
+   ├── src
+   │   ├── data_processing
+   │   ├── experiments
+   │   ├── main_app
+   │   ├── mlflow
+   │   ├── pipeline
+   │   └── utils
+   ├── requirements.txt
+   ├── cleanup_environment.sh
+   ├── setup_environment.sh
 
+3. **Usage**:
+``bash
+   cd src/main_app
+   python train_bci.py
 
 4. **Project structure**:
    ```bash
