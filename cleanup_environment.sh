@@ -19,8 +19,27 @@ remove_pycache() {
     echo "All __pycache__ directories removed."
 }
 
+# Function to kill MLflow server running on port 5000
+kill_mlflow_server() {
+    echo "Attempting to kill process running on port 5000..."
+    if command -v lsof >/dev/null 2>&1; then
+        PID=$(lsof -ti:5000)
+        if [ -n "$PID" ]; then
+            kill -9 $PID
+            echo "Process on port 5000 killed."
+        else
+            echo "No process running on port 5000 found."
+        fi
+    else
+        echo "lsof command not found, unable to kill process on port 5000."
+    fi
+}
+
 # Function to deactivate and clean up
 cleanup() {
+    # Kill MLflow server on port 5000
+    kill_mlflow_server
+
     # Deactivate virtual environment if active
     if [[ "$VIRTUAL_ENV" != "" ]]; then
         echo "Deactivating virtual environment..."
@@ -71,4 +90,3 @@ cleanup() {
 
 # Run the cleanup function
 cleanup
-

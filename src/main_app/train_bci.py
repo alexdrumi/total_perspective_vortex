@@ -85,7 +85,7 @@ def main():
 		trainer.run_experiment()
 		end = time.time()
 
-		print(f"The time the script took to make the model is: {end - start}")
+		print(f"The time the script took : {end - start} ms")
 
 	except FileNotFoundError as e:
 		logging.error(f"File not found: {e}")
