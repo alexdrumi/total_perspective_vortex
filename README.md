@@ -144,14 +144,16 @@ This project includes demo GIFs and screenshots to showcase its functionality. A
 
 **Demo GIFs:**
 
-- **Workflow Overview:**  
-  ![Workflow Overview](assets/mlflow_1.gif)
-
 - **Training Process:**  
   ![Training Process](assets/training_1.gif)
 
 - **Prediction Demo:**  
-  ![Prediction Demo](assets/prediction_demo.gif)
+  ![Prediction Demo](assets/predictions_with_eeg_plot.gif)
+
+- **MLFLOW Overview:**  
+  ![Workflow Overview](assets/mlflow_1.gif)
+
+
 
 
    
