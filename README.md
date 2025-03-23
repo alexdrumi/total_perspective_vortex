@@ -3,55 +3,30 @@
 
 <br />
 <div align="center">
-  <!-- PROJECT LOGO (Optional) -->
-  <!-- <a href="https://github.com/your_username/total_perspective_vortex">
-    <img src="assets/mne_eeg.jpg" alt="Logo" width="80" height="80">
-  </a> -->
+  <a href="https://github.com/your_username/total_perspective_vortex">
+    <img src="assets/mne_eeg.jpg" alt="MNE EEG Logo" width="550" height="300">
+  </a>
 
-  <h3 align="center">Total Perspective Vortex: EEG Motor Imagery Classification Machine Learning</h3>
+  <h3 align="center">Total Perspective Vortex</h3>
+  <p align="center">
+    <strong>EEG Motor Imagery Classification with Machine Learning</strong>
+  </p>
 
   <p align="center">
-    A tool to process EEG data for motor imagery tasks using Python, scikit-learn, MNE, and MLflow.
-    <br />
-    <a href="https://github.com/your_username/total_perspective_vortex"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/your_username/total_perspective_vortex">View Demo</a>
-    ·
-    <a href="https://github.com/your_username/total_perspective_vortex/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    ·
-    <a href="https://github.com/your_username/total_perspective_vortex/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    Dive into a streamlined, powerful pipeline for EEG motor imagery tasks. The tool harnesses the strengths of 
+    <em>Python, scikit-learn, MNE, and MLflow</em> 
+    to deliver a flexible solution for both researchers and enthusiasts.
   </p>
-</div>
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#about-the-project">About The Project</a></li>
-    <li><a href="#built-with">Built With</a></li>
-    <li><a href="#getting-started">Getting Started</a></li>
-      <ul>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#media">Media</a></li>
-    <li><a href="#project-structure">Project Structure</a></li>
-    <li><a href="#additional-tips">Additional Tips</a></li>
-    <li><a href="#sources">Sources</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
+  
+</div>
 
 ---
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-**Short Description:**  
-This repository provides tools to process EEG data for motor imagery tasks using Python, MNE, and scikit-learn. The focus is on filtering, feature extraction, dimensionality reduction (PCA/CSP), and classification of EEG signals. MLflow is integrated for experiment tracking and reproducibility, making it a valuable resource for brain-computer interface (BCI) research and development.
+In this repository, you'll find a robust toolkit for EEG motor imagery tasks—perfect for BCI research and development. Powered by Python, MNE, and scikit-learn, it provides functionality for signal filtering, feature extraction, dimensionality reduction (PCA), and classification. With MLflow integration for streamlined experiment tracking and reproducibility, this resource helps you confidently explore new approaches in EEG data analysis.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -90,8 +65,21 @@ Follow these instructions to set up the project locally.
    https://physionet.org/static/published-projects/eegmmidb/eeg-motor-movementimagery-dataset-1.0.0.zip
 
 
-4. **Unzip the downloaded EEG data:**
+4. **Unzip the downloaded EEG data. Place all the files into the data folder as shown below.**
    ```bash
+   data
+   ├── 64_channel_sharbrough-old.png
+   ├── 64_channel_sharbrough.pdf
+   ├── 64_channel_sharbrough.png
+   ├── SHA256SUMS.txt
+   ├── data.sh
+   ├── wfdbcal
+   ├── ANNOTATORS
+   ├── RECORDS
+   ├── S001
+   ├── S002
+   └── ... (S003 to S109)
+   ----------------------------------
    .
    ├── cleanup_environment.sh
    ├── config
@@ -102,17 +90,7 @@ Follow these instructions to set up the project locally.
    ├── setup_environment.sh
    ├── src
    ├── venv
-   └── assets   # Contains logos, screenshots, GIFs, etc.
-   ----------------------------------
-   data
-   ├── 64_channel_sharbrough-old.png
-   ├── 64_channel_sharbrough.pdf
-   ├── 64_channel_sharbrough.png
-   ├── ANNOTATORS
-   ├── RECORDS
-   ├── S001
-   ├── S002
-   └── ... (S003 to S109)
+   └── assets  
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE -->
@@ -147,7 +125,7 @@ This project includes demo GIFs and screenshots to showcase its functionality. A
 - **Training Process:**  
   ![Training Process](assets/training_1.gif)
 
-- **Prediction Demo:**  
+- **Prediction Process:**  
   ![Prediction Demo](assets/predictions_with_eeg_plot.gif)
 
 - **MLFLOW Overview:**  
