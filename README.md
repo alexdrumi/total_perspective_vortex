@@ -5,7 +5,7 @@
 <div align="center">
   <!-- PROJECT LOGO (Optional) -->
   <!-- <a href="https://github.com/your_username/total_perspective_vortex">
-    <img src="assets/logo.png" alt="Logo" width="80" height="80">
+    <img src="assets/mne_eeg.jpg" alt="Logo" width="80" height="80">
   </a> -->
 
   <h3 align="center">Total Perspective Vortex: EEG Motor Imagery Classification Machine Learning</h3>
