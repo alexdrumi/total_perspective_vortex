@@ -130,6 +130,12 @@ Follow these instructions to set up the project locally.
    ```bash
    cd src/main_app
    python predict_bci.py
+
+8. **Make predictions with EEG plot (optional):**
+   ```bash
+   cd src/main_app
+   python predict_bci.py --plot_eeg_predictions=true
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Media
