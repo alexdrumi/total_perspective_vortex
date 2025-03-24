@@ -61,7 +61,7 @@ Follow these instructions to set up the project locally.
    ```bash
    source ./setup_environment.sh
 
-3. **Download EEG Motor Movement Data: Manually download the dataset from:**
+3. **Download EEG Motor Movement Data: Manually download the dataset (1.9GB) from:**
    https://physionet.org/static/published-projects/eegmmidb/eeg-motor-movementimagery-dataset-1.0.0.zip
 
 
