@@ -54,7 +54,7 @@ Follow these instructions to set up the project locally.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your_username/total_perspective_vortex.git
+   git clone https://github.com/alexdrumi/total_perspective_vortex.git
    cd total_perspective_vortex
 
 2. **Setup the environment:**
